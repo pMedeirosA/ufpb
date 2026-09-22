@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin — Memórias das Poetisas da Literatura de Cordel</title>
+  <style>
+    /* ========== FONTE PERSONALIZADA ========== */
+    @font-face {
+      font-family: 'JacksonXilogravura';
+      src: url('../fonts/JacksonXilogravura-Regular.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --terracotta: #C4513D;
+      --terracotta-dark: #a3402f;
+      --gold: #D4A853;
+      --gold-light: #e6c882;
+      --beige: #F5EDE3;
+      --brown: #1E110A;
+      --brown-medium: #2C1810;
+      --brown-light: #5a3d2e;
+      --white: #FFFFFF;
+      --danger: #c0392b;
+      --danger-dark: #96281b;
+      --sidebar-w: 260px;
+      --header-h: 70px;
+      --panel-w: 520px;
+    }
+
+    html { font-size: 15px; }
+
+    body {
+      font-family: 'JacksonXilogravura', 'Georgia', serif;
+      background: var(--beige);
+      color: var(--brown);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ========== SCROLLBAR ========== */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--beige); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--terracotta); }
+
+    /* ========== TELA DE LOGIN ========== */
+    .login-overlay {
+      position: fixed; inset: 0;
+      background: var(--brown-medium);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    .login-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .login-card {
+      background: var(--beige);
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%; max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .login-card h1 {
+      font-size: 1.4rem;
+      color: var(--terracotta);
+      margin-bottom: 6px;
+    }
+    .login-card .login-subtitle {
+      font-size: 0.85rem;
+      color: var(--brown-light);
+      margin-bottom: 28px;
+    }
+    .login-card input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid var(--gold);
+      border-radius: 10px;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--brown);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .login-card input:focus { border-color: var(--terracotta); }
+    .login-card input::placeholder { color: #b5a28e; }
+    .login-error {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 8px;
+      min-height: 1.2em;
+    }
+    .login-card button {
+      margin-top: 18px;
+      width: 100%;
+      padding: 14px;
+      background: var(--terracotta);
+      color: var(--beige);
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .login-card button:hover { background: var(--terracotta-dark); }
+    .login-ornament {
+      margin-top: 24px;
+      color: var(--gold);
+      font-size: 1.6rem;
+      letter-spacing: 8px;
+    }
+
+    /* ========== LAYOUT PRINCIPAL ========== */
+    .app { display: flex; min-height: 100vh; }
+
+    /* Barra lateral */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--brown-medium);
+      color: var(--beige);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+    .sidebar-brand {
+      padding: 28px 24px 8px;
+      font-size: 1.15rem;
+      color: var(--gold);
+      line-height: 1.3;
+    }
+    .sidebar-label {
+      padding: 4px 24px 24px;
+      font-size: 0.75rem;
+      color: var(--gold-light);
+      opacity: 0.7;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .sidebar-nav {
+      flex: 1;
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 0 12px;
+    }
+    .sidebar-link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px;
+      color: var(--beige);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .sidebar-link:hover { background: rgba(245,237,227,0.1); }
+    .sidebar-link.active { background: var(--terracotta); }
+    .sidebar-link svg {
+      width: 20px; height: 20px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .sidebar-footer {
+      padding: 20px 24px;
+      border-top: 1px solid rgba(245,237,227,0.1);
+    }
+    .sidebar-footer a {
+      color: var(--gold-light);
+      text-decoration: none;
+      font-size: 0.8rem;
+      display: flex; align-items: center; gap: 8px;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+    .sidebar-footer a:hover { opacity: 1; }
+    .sidebar-footer a svg {
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* Área principal */
+    .main {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      display: flex; flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Cabeçalho */
+    .header {
+      height: var(--header-h);
+      background: var(--white);
+      border-bottom: 2px solid var(--gold);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .header-title {
+      font-size: 1.2rem;
+      color: var(--brown);
+    }
+    .header-meta {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .header-count {
+      background: var(--terracotta);
+      color: var(--beige);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+    .btn-logout {
+      background: none;
+      border: 1px solid var(--brown-light);
+      color: var(--brown-light);
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover {
+      background: var(--brown-medium);
+      color: var(--beige);
+    }
+
+    /* Botão hambúrguer (mobile) */
+    .mobile-toggle {
+      display: none;
+      background: none; border: none;
+      cursor: pointer; padding: 6px;
+    }
+    .mobile-toggle span {
+      display: block; width: 24px; height: 2px;
+      background: var(--brown);
+      margin: 5px 0;
+      border-radius: 2px;
+    }
+
+    /* Conteúdo */
+    .content { flex: 1; padding: 32px; }
+
+    .content-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .content-header h2 {
+      font-size: 1.3rem;
+      color: var(--brown);
+    }
+
+    .btn-add {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--terracotta);
+      color: var(--beige);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-add:hover { background: var(--terracotta-dark); transform: translateY(-1px); }
+    .btn-add svg {
+      width: 18px; height: 18px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* Indicador de carregamento global */
+    .loading-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 3px; background: var(--gold);
+      z-index: 9998;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .loading-bar.active { transform: scaleX(1); animation: loading-pulse 1.5s ease-in-out infinite; }
+    @keyframes loading-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ========== CARTÕES DE POETISAS ========== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+    }
+
+    .poetisa-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex; align-items: flex-start; gap: 16px;
+      border: 2px solid transparent;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+    .poetisa-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 4px 16px rgba(44,24,16,0.06);
+    }
+
+    .card-avatar {
+      width: 56px; height: 56px;
+      border-radius: 12px;
+      background: var(--terracotta);
+      color: var(--beige);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .card-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    .card-body { flex: 1; min-width: 0; }
+    .card-name {
+      font-size: 1rem;
+      color: var(--brown);
+      margin-bottom: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .card-subtitle {
+      font-size: 0.78rem;
+      color: var(--brown-light);
+      margin-bottom: 6px;
+    }
+    .card-meta-badges {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .card-badge {
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: rgba(212,168,83,0.15);
+      color: var(--brown-light);
+    }
+    .card-badge.upload { background: rgba(196,81,61,0.1); color: var(--terracotta); }
+    .card-badge.url { background: rgba(212,168,83,0.2); color: #8a6d2b; }
+    .card-badge.video { background: rgba(44,24,16,0.08); color: var(--brown-light); }
+
+    .card-actions {
+      display: flex; flex-direction: column; gap: 6px;
+      flex-shrink: 0;
+    }
+    .card-btn {
+      width: 36px; height: 36px;
+      border: none; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .card-btn svg {
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .card-btn-edit {
+      background: rgba(212,168,83,0.15);
+      color: var(--gold);
+    }
+    .card-btn-edit:hover { background: var(--gold); color: var(--white); transform: scale(1.05); }
+    .card-btn-delete {
+      background: rgba(192,57,43,0.1);
+      color: var(--danger);
+    }
+    .card-btn-delete:hover { background: var(--danger); color: var(--white); transform: scale(1.05); }
+
+    /* ========== ESTADO VAZIO ========== */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--brown-light);
+    }
+    .empty-state svg {
+      width: 64px; height: 64px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 1.2;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .empty-state p { font-size: 1rem; }
+
+    /* ========== PAINEL DESLIZANTE (FORMULÁRIO) ========== */
+    .panel-overlay {
+      position: fixed; inset: 0;
+      background: rgba(44,24,16,0.4);
+      z-index: 200;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .panel-overlay.active { opacity: 1; visibility: visible; }
+
+    .panel {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: var(--panel-w);
+      max-width: 100vw;
+      background: var(--white);
+      z-index: 201;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
+      box-shadow: -8px 0 30px rgba(44,24,16,0.15);
+    }
+    .panel.active { transform: translateX(0); }
+
+    .panel-header {
+      padding: 24px 28px;
+      border-bottom: 2px solid var(--gold);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-header h3 {
+      font-size: 1.1rem;
+      color: var(--terracotta);
+    }
+    .panel-close {
+      width: 36px; height: 36px;
+      border: none; border-radius: 8px;
+      background: rgba(44,24,16,0.06);
+      color: var(--brown);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: background 0.2s;
+    }
+    .panel-close:hover { background: rgba(44,24,16,0.12); }
+
+    .panel-body {
+      flex: 1; overflow-y: auto;
+      padding: 28px;
+    }
+
+    /* Formulário */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--brown);
+      margin-bottom: 6px;
+    }
+    .form-label span { color: var(--danger); }
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e0d5c8;
+      border-radius: 8px;
+      background: var(--beige);
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--brown);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus,
+    .form-textarea:focus { border-color: var(--terracotta); }
+    .form-input:disabled,
+    .form-textarea:disabled { opacity: 0.6; cursor: not-allowed; }
+    .form-textarea { resize: vertical; min-height: 100px; }
+    .form-textarea.tall { min-height: 160px; }
+
+    .form-initials-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-top: 8px;
+    }
+    .form-initials-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px;
+      background: var(--terracotta);
+      color: var(--beige);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    .form-initials-input {
+      width: 60px;
+      padding: 8px 10px;
+      border: 2px solid #e0d5c8;
+      border-radius: 8px;
+      background: var(--beige);
+      font-family: inherit;
+      font-size: 0.85rem;
+      color: var(--brown);
+      text-align: center;
+      text-transform: uppercase;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-initials-input:focus { border-color: var(--terracotta); }
+    .form-initials-label {
+      font-size: 0.75rem;
+      color: var(--brown-light);
+    }
+
+    /* ========== ABAS DE TIPO DE FOTO ========== */
+    .photo-tabs {
+      display: flex; gap: 0;
+      margin-bottom: 14px;
+      border: 2px solid #e0d5c8;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .photo-tab {
+      flex: 1;
+      padding: 10px 8px;
+      background: var(--beige);
+      border: none;
+      font-family: inherit;
+      font-size: 0.78rem;
+      color: var(--brown-light);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .photo-tab:not(:last-child) { border-right: 2px solid #e0d5c8; }
+    .photo-tab.active {
+      background: var(--terracotta);
+      color: var(--beige);
+    }
+    .photo-tab:hover:not(.active) { background: #ece3d7; }
+
+    .photo-panel { display: none; }
+    .photo-panel.active { display: block; }
+
+
+
+    /* Preview de foto */
+    .form-preview {
+      margin-top: 12px;
+      width: 90px; height: 90px;
+      border-radius: 12px;
+      overflow: hidden;
+      display: none;
+      border: 2px solid var(--gold);
+    }
+    .form-preview img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .form-preview.visible { display: block; }
+
+    /* Preview de vídeo */
+    .video-preview {
+      margin-top: 12px;
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+      border: 2px solid var(--gold);
+      aspect-ratio: 16/9;
+    }
+    .video-preview.visible { display: block; }
+    .video-preview iframe {
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    /* Ações do formulário */
+    .form-actions {
+      display: flex; gap: 12px;
+      padding-top: 8px;
+    }
+    .btn-save {
+      flex: 1;
+      padding: 14px;
+      background: var(--terracotta);
+      color: var(--beige);
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-save:hover:not(:disabled) { background: var(--terracotta-dark); }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-cancel {
+      padding: 14px 24px;
+      background: none;
+      border: 2px solid #e0d5c8;
+      color: var(--brown-light);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-cancel:hover { border-color: var(--brown-light); color: var(--brown); }
+
+    /* ========== DIÁLOGO DE CONFIRMAÇÃO ========== */
+    .confirm-overlay {
+      position: fixed; inset: 0;
+      background: rgba(44,24,16,0.5);
+      z-index: 300;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    .confirm-overlay.active { opacity: 1; visibility: visible; }
+    .confirm-dialog {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 36px 32px 28px;
+      max-width: 380px; width: 90%;
+      text-align: center;
+    }
+    .confirm-icon {
+      width: 48px; height: 48px;
+      background: rgba(192,57,43,0.1);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .confirm-icon svg {
+      width: 24px; height: 24px;
+      stroke: var(--danger);
+      fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .confirm-dialog h4 { font-size: 1.05rem; color: var(--brown); margin-bottom: 8px; }
+    .confirm-dialog p { font-size: 0.85rem; color: var(--brown-light); margin-bottom: 24px; }
+    .confirm-actions { display: flex; gap: 10px; }
+    .btn-confirm-cancel {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: 2px solid #e0d5c8;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--brown-light);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-confirm-cancel:hover { border-color: var(--brown); color: var(--brown); }
+    .btn-confirm-delete {
+      flex: 1;
+      padding: 12px;
+      background: var(--danger);
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--white);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-confirm-delete:hover { background: var(--danger-dark); }
+    .btn-confirm-delete:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ========== TOAST (NOTIFICAÇÕES) ========== */
+    .toast {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      background: var(--brown-medium);
+      color: var(--beige);
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      z-index: 400;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      box-shadow: 0 8px 24px rgba(44,24,16,0.2);
+      max-width: 380px;
+    }
+    .toast.visible { transform: translateY(0); opacity: 1; }
+    .toast.success { border-left: 4px solid var(--gold); }
+    .toast.error { border-left: 4px solid var(--danger); }
+
+    /* ========== RESPONSIVO ========== */
+    @media (max-width: 900px) {
+      :root { --sidebar-w: 0px; }
+      .sidebar {
+        transform: translateX(-100%);
+        width: 260px;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(30,17,10,0.5);
+        z-index: 999;
+      }
+      .sidebar-overlay.active { display: block; }
+      .mobile-toggle { display: block; }
+      .main { margin-left: 0; }
+      .content { padding: 20px; }
+      .card-grid { grid-template-columns: 1fr; }
+      .panel { width: 100%; }
+    }
+
+    @media (max-width: 500px) {
+      .header { padding: 0 16px; }
+      .content-header { flex-direction: column; align-items: flex-start; }
+      .login-card { padding: 36px 24px; margin: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de carregamento global -->
+  <div class="loading-bar" id="loadingBar"></div>
+
+  <!-- ========== TELA DE LOGIN ========== -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <h1>Painel Admin</h1>
+      <p class="login-subtitle">Memórias das Poetisas da Literatura de Cordel</p>
+      <div id="loginArea">
+        <button type="button" id="btnGoogleLogin" style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 24px;border:1px solid rgba(139,94,60,0.2);border-radius:8px;background:white;color:var(--brown);font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Entrar com Google
+        </button>
+        <div class="login-error" id="loginError"></div>
+      </div>
+      <p id="loginLoading" style="display:none;color:var(--brown-light);font-size:14px;margin-top:12px;">Verificando acesso...</p>
+      <div class="login-ornament">✦ ✦ ✦</div>
+    </div>
+  </div>
+
+  <!-- ========== APLICAÇÃO ========== -->
+  <div class="app" id="app" style="display:none;">
+
+    <!-- Overlay para fechar sidebar no mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Barra lateral -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">Memórias das Poetisas da Literatura de Cordel</div>
+      <div class="sidebar-label">Painel Admin</div>
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active" onclick="return false">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Biografias
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="index.html">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          Voltar ao site
+        </a>
+      </div>
+    </aside>
+
+    <!-- Área principal -->
+    <div class="main">
+      <!-- Cabeçalho -->
+      <header class="header">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 class="header-title">Painel de Biografias</h1>
+        </div>
+        <div class="header-meta">
+          <span class="header-count" id="headerCount">0 poetisas</span>
+          <button class="btn-logout" id="btnLogout">Sair</button>
+        </div>
+      </header>
+
+      <!-- Conteúdo -->
+      <main class="content">
+        <div class="content-header">
+          <h2>Todas as Poetisas</h2>
+          <button class="btn-add" id="btnAdd">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova Poetisa
+          </button>
+        </div>
+
+        <div class="card-grid" id="cardGrid"></div>
+
+        <div class="empty-state" id="emptyState" style="display:none;">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="17" y1="11" x2="23" y2="11"/>
+          </svg>
+          <p>Nenhuma poetisa cadastrada</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ========== PAINEL DESLIZANTE (FORMULÁRIO) ========== -->
+  <div class="panel-overlay" id="panelOverlay"></div>
+  <div class="panel" id="panel">
+    <div class="panel-header">
+      <h3 id="panelTitle">Nova Poetisa</h3>
+      <button class="panel-close" id="panelClose">✕</button>
+    </div>
+    <div class="panel-body">
+      <form id="poetisaForm" autocomplete="off">
+        <input type="hidden" id="formDocId">
+
+        <!-- Nome -->
+        <div class="form-group">
+          <label class="form-label">Nome <span>*</span></label>
+          <input type="text" class="form-input" id="formName" required placeholder="Nome completo da poetisa">
+        </div>
+
+        <!-- Iniciais (auto-geradas, editáveis) -->
+        <div class="form-group">
+          <label class="form-label">Iniciais</label>
+          <div class="form-initials-row">
+            <div class="form-initials-badge" id="initialsBadge">--</div>
+            <input type="text" class="form-initials-input" id="formInitials" maxlength="2" placeholder="XX">
+            <span class="form-initials-label">Auto-gerado do nome (editável)</span>
+          </div>
+        </div>
+
+        <!-- Subtítulo -->
+        <div class="form-group">
+          <label class="form-label">Subtítulo</label>
+          <input type="text" class="form-input" id="formSubtitle" placeholder="Ex: Poetisa e educadora">
+        </div>
+
+        <!-- Resumo -->
+        <div class="form-group">
+          <label class="form-label">Resumo</label>
+          <textarea class="form-textarea" id="formSummary" placeholder="Resumo curto para o cartão de apresentação"></textarea>
+        </div>
+
+        <!-- Biografia completa -->
+        <div class="form-group">
+          <label class="form-label">Biografia completa</label>
+          <textarea class="form-textarea tall" id="formBio" placeholder="Biografia detalhada (use linhas em branco para separar parágrafos)"></textarea>
+        </div>
+
+        <!-- Foto com abas -->
+        <div class="form-group">
+          <label class="form-label">Foto</label>
+          <div class="photo-tabs">
+            <button type="button" class="photo-tab active" data-tab="url">URL da Imagem</button>
+            <button type="button" class="photo-tab" data-tab="none">Nenhuma</button>
+          </div>
+
+          <!-- Aba: URL -->
+          <div class="photo-panel active" id="photoTabUrl" data-panel="url">
+            <input type="url" class="form-input" id="formPhotoUrl" placeholder="https://exemplo.com/foto.jpg">
+            <p style="font-size:0.8rem; color:var(--brown-light); margin-top:6px;">Cole o link direto da imagem (Google Drive, Imgur, etc.)</p>
+            <div class="form-preview" id="urlPreview"><img id="urlPreviewImg" alt="Preview"></div>
+          </div>
+
+          <!-- Aba: Nenhuma -->
+          <div class="photo-panel" id="photoTabNone" data-panel="none">
+            <p style="font-size:0.82rem; color:var(--brown-light); padding:12px 0;">
+              Sem foto — as iniciais serão usadas como placeholder.
+            </p>
+          </div>
+        </div>
+
+        <!-- Vídeo (opcional) -->
+        <div class="form-group">
+          <label class="form-label">Vídeo (opcional)</label>
+          <input type="url" class="form-input" id="formVideoUrl" placeholder="URL do YouTube ou Vimeo">
+          <div class="video-preview" id="videoPreview"><iframe id="videoPreviewFrame" allowfullscreen></iframe></div>
+        </div>
+
+        <!-- Ações -->
+        <div class="form-actions">
+          <button type="submit" class="btn-save" id="btnSave">Salvar</button>
+          <button type="button" class="btn-cancel" id="btnFormCancel">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========== DIÁLOGO DE CONFIRMAÇÃO ========== -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-dialog">
+      <div class="confirm-icon">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+      </div>
+      <h4>Excluir Poetisa</h4>
+      <p id="confirmMessage">Tem certeza que deseja excluir esta poetisa? Esta ação não pode ser desfeita.</p>
+      <div class="confirm-actions">
+        <button class="btn-confirm-cancel" id="btnConfirmCancel">Cancelar</button>
+        <button class="btn-confirm-delete" id="btnConfirmDelete">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TOAST (NOTIFICAÇÃO) ========== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ==========  SDK (Compat) ========== -->
+  <script src="https://www.gstatic.com/"></script>
+  <script src="https://www.gstatic.com/"></script>
+  <script src="https://www.gstatic.com/"></script>
+  <!-- Config compartilhado (edite  para configurar) -->
+  <script src="../back/"></script>
+
+  <script>
+    const poetisasRef = db.collection('poetisas');
+
+    /* ============================================================
+       CONSTANTES E ESTADO
+    ============================================================ */
+    const AUTH_KEY = 'admin_auth';
+    // Emails autorizados a acessar o painel (adicione/remova conforme necessário)
+    const ALLOWED_EMAILS = [
+      // TODO: Adicione aqui os emails autorizados
+      // Ex: 'cliente@gmail.com',
+    ];
+
+    let poetisas = [];         // Lista local sincronizada com 
+    let deleteTargetId = null; // ID do documento a ser excluído
+    let deleteTargetData = null; // Dados do documento a ser excluído
+    let currentPhotoType = 'url'; // Tipo de foto selecionado na aba
+    let isSaving = false;      // Flag para evitar duplo submit
+
+    /* ============================================================
+       FUNÇÕES UTILITÁRIAS
+    ============================================================ */
+
+    /**
+     * Gera as iniciais a partir do nome completo
+     * Ex: "Maria das Neves" → "MN"
+     */
+    function getInitials(name) {
+      if (!name) return '';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    /**
+     * Retorna a primeira letra do nome (sem acentos)
+     * Usada para agrupamento alfabético
+     */
+    function getLetter(name) {
+      if (!name) return '';
+      return name.trim()[0].toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    /**
+     * Escapa HTML para prevenir XSS
+     */
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    /**
+     * Converte URL do Google Drive para link direto de imagem
+     * drive.google.com/file/d/ID/view -> drive.google.com/uc?export=view&id=ID
+     */
+    function getDirectImageUrl(url) {
+      if (!url) return '';
+      url = url.trim();
+      const driveRegex = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
+      const match = url.match(driveRegex);
+      if (match && match[1]) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      }
+      return url;
+    }
+
+    /**
+     * Converte URL de YouTube/Vimeo para URL de embed
+     * Suporta: youtube.com/watch, youtu.be, vimeo.com
+     */
+    function getEmbedUrl(url) {
+      if (!url) return '';
+      url = url.trim();
+
+      // YouTube: youtube.com/watch?v=ID
+      let match = url.match(/(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+      if (match) return 'https://www.youtube.com/embed/' + match[1];
+
+      // YouTube: youtu.be/ID
+      match = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+      if (match) return 'https://www.youtube.com/embed/' + match[1];
+
+      // YouTube: youtube.com/shorts/ID
+      match = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/);
+      if (match) return 'https://www.youtube.com/embed/' + match[1];
+
+      // Vimeo: vimeo.com/ID
+      match = url.match(/vimeo\.com\/(\d+)/);
+      if (match) return 'https://player.vimeo.com/video/' + match[1];
+
+      // Se já for URL de embed, retorna como está
+      if (url.includes('youtube.com/embed/') || url.includes('player.vimeo.com/video/')) {
+        return url;
+      }
+
+      return '';
+    }
+
+    /* ============================================================
+       INDICADOR DE CARREGAMENTO
+    ============================================================ */
+    function showLoading() {
+      document.getElementById('loadingBar').classList.add('active');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingBar').classList.remove('active');
+    }
+
+    /* ============================================================
+       TOAST (NOTIFICAÇÕES)
+    ============================================================ */
+    let toastTimeout = null;
+    function showToast(message, type) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + (type || 'success');
+      clearTimeout(toastTimeout);
+      requestAnimationFrame(() => {
+        toast.classList.add('visible');
+      });
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('visible');
+      }, 3500);
+    }
+
+    /* ============================================================
+       AUTENTICAÇÃO VIA GOOGLE OAUTH
+    ============================================================ */
+    const auth = ();
+    const googleProvider = new ();
+
+    function checkAuth() {
+      return auth.currentUser !== null;
+    }
+
+    function initAuth() {
+      const overlay = document.getElementById('loginOverlay');
+      const app = document.getElementById('app');
+
+      // Observa mudanças de estado de autenticação
+      auth.onAuthStateChanged(function(user) {
+        if (user && isEmailAllowed(user.email)) {
+          overlay.classList.add('hidden');
+          app.style.display = 'flex';
+          // Atualiza nome do usuário no header se quiser
+          const logoutBtn = document.getElementById('btnLogout');
+          if (logoutBtn) logoutBtn.title = 'Sair (' + user.email + ')';
+          loadPoetisas();
+        } else if (user && !isEmailAllowed(user.email)) {
+          // Usuário logou mas email não autorizado
+          auth.signOut();
+          document.getElementById('loginError').textContent = 
+            'Acesso negado. O email "' + user.email + '" não está autorizado.';
+          overlay.classList.remove('hidden');
+          app.style.display = 'none';
+          document.getElementById('loginLoading').style.display = 'none';
+        } else {
+          overlay.classList.remove('hidden');
+          app.style.display = 'none';
+          document.getElementById('loginLoading').style.display = 'none';
+        }
+      });
+
+      // Botão de login com Google
+      document.getElementById('btnGoogleLogin').addEventListener('click', async function() {
+        const err = document.getElementById('loginError');
+        err.textContent = '';
+        document.getElementById('loginLoading').style.display = 'block';
+        this.style.display = 'none';
+
+        try {
+          await auth.signInWithPopup(googleProvider);
+        } catch (error) {
+          console.error('Erro no login:', error);
+          err.textContent = 'Erro ao fazer login. Tente novamente.';
+          document.getElementById('loginLoading').style.display = 'none';
+          this.style.display = 'flex';
+        }
+      });
+    }
+
+    function isEmailAllowed(email) {
+      if (!email) return false;
+      // Se a lista estiver vazia, permite qualquer email (para facilitar setup inicial)
+      if (ALLOWED_EMAILS.length === 0) return true;
+      return ALLOWED_EMAILS.includes(email.toLowerCase());
+    }
+
+    /* ============================================================
+        — CARREGAR POETISAS
+    ============================================================ */
+    async function loadPoetisas() {
+      showLoading();
+      try {
+        const snapshot = await poetisasRef.get();
+        poetisas = [];
+        snapshot.forEach(doc => {
+          poetisas.push({ id: doc.id, ...doc.data() });
+        });
+        renderCards();
+      } catch (error) {
+        console.error('Erro ao carregar poetisas:', error);
+        showToast('Erro ao carregar dados do ', 'error');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    /* ============================================================
+       RENDERIZAÇÃO DOS CARTÕES
+    ============================================================ */
+    function renderCards() {
+      const grid = document.getElementById('cardGrid');
+      const empty = document.getElementById('emptyState');
+      const count = document.getElementById('headerCount');
+
+      // Ordenar alfabeticamente
+      poetisas.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR'));
+
+      count.textContent = poetisas.length + (poetisas.length === 1 ? ' poetisa' : ' poetisas');
+
+      if (poetisas.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+
+      grid.innerHTML = poetisas.map(p => {
+        // Determinar avatar: foto ou iniciais
+        const hasPhoto = p.photoUrl && p.photoType !== 'none';
+        const avatarContent = hasPhoto
+          ? `<img src="${escapeHtml(p.photoUrl)}" alt="${escapeHtml(p.name)}" loading="lazy">`
+          : escapeHtml(p.initials || '--');
+
+        // Badges informativos
+        let badges = '';
+        if (p.photoType === 'url') badges += '<span class="card-badge url">🔗 Imagem</span>';
+        if (p.videoUrl) badges += '<span class="card-badge video">▶ Vídeo</span>';
+
+        return `
+          <div class="poetisa-card" data-id="${p.id}">
+            <div class="card-avatar">${avatarContent}</div>
+            <div class="card-body">
+              <div class="card-name">${escapeHtml(p.name)}</div>
+              <div class="card-subtitle">${escapeHtml(p.subtitle || '')}</div>
+              ${badges ? '<div class="card-meta-badges">' + badges + '</div>' : ''}
+            </div>
+            <div class="card-actions">
+              <button class="card-btn card-btn-edit" title="Editar" onclick="editPoetisa('${p.id}')">
+                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="card-btn card-btn-delete" title="Excluir" onclick="confirmDelete('${p.id}')">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* ============================================================
+       PAINEL — ABRIR / FECHAR
+    ============================================================ */
+    function openPanel(title) {
+      document.getElementById('panelTitle').textContent = title || 'Nova Poetisa';
+      document.getElementById('panelOverlay').classList.add('active');
+      document.getElementById('panel').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePanel() {
+      if (isSaving) return; // Não fechar durante salvamento
+      document.getElementById('panelOverlay').classList.remove('active');
+      document.getElementById('panel').classList.remove('active');
+      document.body.style.overflow = '';
+      resetForm();
+    }
+
+    /**
+     * Reseta todos os campos do formulário ao estado inicial
+     */
+    function resetForm() {
+      document.getElementById('poetisaForm').reset();
+      document.getElementById('formDocId').value = '';
+      document.getElementById('formInitials').value = '';
+      document.getElementById('initialsBadge').textContent = '--';
+
+      // Resetar abas de foto
+      setPhotoTab('url');
+      document.getElementById('urlPreview').classList.remove('visible');
+
+      // Resetar vídeo
+      document.getElementById('videoPreview').classList.remove('visible');
+      document.getElementById('videoPreviewFrame').src = '';
+
+      // Resetar estado de salvamento
+      setFormDisabled(false);
+    }
+
+    /* ============================================================
+       ABAS DE TIPO DE FOTO
+    ============================================================ */
+    function setPhotoTab(tabName) {
+      currentPhotoType = tabName;
+
+      // Atualizar abas visuais
+      document.querySelectorAll('.photo-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabName);
+      });
+
+      // Mostrar painel correspondente
+      document.querySelectorAll('.photo-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.dataset.panel === tabName);
+      });
+    }
+
+    /* ============================================================
+       FORMULÁRIO — ABRIR PARA ADICIONAR
+    ============================================================ */
+    function openAddForm() {
+      resetForm();
+      openPanel('Nova Poetisa');
+      document.getElementById('formName').focus();
+    }
+
+    /* ============================================================
+       FORMULÁRIO — ABRIR PARA EDITAR
+    ============================================================ */
+    function editPoetisa(id) {
+      const p = poetisas.find(x => x.id === id);
+      if (!p) return;
+
+      resetForm();
+      document.getElementById('formDocId').value = p.id;
+      document.getElementById('formName').value = p.name || '';
+      document.getElementById('formSubtitle').value = p.subtitle || '';
+      document.getElementById('formSummary').value = p.summary || '';
+      document.getElementById('formBio').value = p.bio || '';
+      document.getElementById('formVideoUrl').value = p.videoUrl || '';
+
+      // Iniciais
+      const initials = p.initials || getInitials(p.name);
+      document.getElementById('formInitials').value = initials;
+      document.getElementById('initialsBadge').textContent = initials || '--';
+
+      // Tipo de foto
+      const photoType = p.photoType || 'none';
+      setPhotoTab(photoType);
+
+      if (photoType === 'upload' && p.photoUrl) {
+        // Legado — tratar upload antigo como URL
+        document.getElementById('formPhotoUrl').value = p.photoUrl;
+        document.getElementById('urlPreviewImg').src = p.photoUrl;
+        document.getElementById('urlPreview').classList.add('visible');
+        setPhotoTab('url');
+      } else if (photoType === 'url' && p.photoUrl) {
+        document.getElementById('formPhotoUrl').value = p.photoUrl;
+        document.getElementById('urlPreviewImg').src = p.photoUrl;
+        document.getElementById('urlPreview').classList.add('visible');
+      }
+
+      // Preview de vídeo
+      if (p.videoUrl) {
+        updateVideoPreview(p.videoUrl);
+      }
+
+      openPanel('Editar Poetisa');
+    }
+
+    /* ============================================================
+       INICIAIS — ATUALIZAÇÃO EM TEMPO REAL
+    ============================================================ */
+    function updateInitialsFromName(name) {
+      const initials = getInitials(name);
+      document.getElementById('formInitials').value = initials;
+      document.getElementById('initialsBadge').textContent = initials || '--';
+    }
+
+
+    /* ============================================================
+       PREVIEW DE URL DE FOTO
+    ============================================================ */
+    function handlePhotoUrlInput(e) {
+      let url = e.target.value.trim();
+      url = getDirectImageUrl(url); // Auto-converte links do Google Drive
+      const previewEl = document.getElementById('urlPreview');
+      const imgEl = document.getElementById('urlPreviewImg');
+
+      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        imgEl.src = url;
+        previewEl.classList.add('visible');
+        // Tratar erro de carregamento
+        imgEl.onerror = () => { previewEl.classList.remove('visible'); };
+      } else {
+        previewEl.classList.remove('visible');
+      }
+    }
+
+    /* ============================================================
+       PREVIEW DE VÍDEO
+    ============================================================ */
+    function updateVideoPreview(url) {
+      const embedUrl = getEmbedUrl(url);
+      const previewEl = document.getElementById('videoPreview');
+      const frameEl = document.getElementById('videoPreviewFrame');
+
+      if (embedUrl) {
+        frameEl.src = embedUrl;
+        previewEl.classList.add('visible');
+      } else {
+        frameEl.src = '';
+        previewEl.classList.remove('visible');
+      }
+    }
+
+    function handleVideoUrlInput(e) {
+      updateVideoPreview(e.target.value);
+    }
+
+    /* ============================================================
+       DESABILITAR/HABILITAR FORMULÁRIO DURANTE SALVAMENTO
+    ============================================================ */
+    function setFormDisabled(disabled) {
+      isSaving = disabled;
+      const form = document.getElementById('poetisaForm');
+      const inputs = form.querySelectorAll('input, textarea, button, select');
+      inputs.forEach(el => {
+        if (el.id === 'btnFormCancel') return; // Manter cancelar ativo
+        el.disabled = disabled;
+      });
+      document.getElementById('btnSave').textContent = disabled ? 'Salvando...' : 'Salvar';
+    }
+
+    /* ============================================================
+       FORMULÁRIO — SALVAR (ADICIONAR / EDITAR)
+    ============================================================ */
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      if (isSaving) return;
+
+      const docId = document.getElementById('formDocId').value;
+      const name = document.getElementById('formName').value.trim();
+      const subtitle = document.getElementById('formSubtitle').value.trim();
+      const summary = document.getElementById('formSummary').value.trim();
+      const bio = document.getElementById('formBio').value.trim();
+      const initialsInput = document.getElementById('formInitials').value.trim().toUpperCase();
+      const videoUrlRaw = document.getElementById('formVideoUrl').value.trim();
+
+      // Validação
+      if (!name) {
+        showToast('Por favor, preencha o nome da poetisa.', 'error');
+        return;
+      }
+
+      setFormDisabled(true);
+      showLoading();
+
+      try {
+        // Iniciais: usar o valor do campo (editável) ou auto-gerar
+        const initials = initialsInput.substring(0, 2) || getInitials(name);
+        const letter = getLetter(name);
+        const videoUrl = getEmbedUrl(videoUrlRaw) || '';
+
+        // Determinar foto
+        let photoUrl = '';
+        let photoType = currentPhotoType;
+
+        // ID do documento (novo ou existente)
+        let targetDocId = docId;
+        if (!targetDocId) {
+          const newDoc = poetisasRef.doc();
+          targetDocId = newDoc.id;
+        }
+
+        if (photoType === 'url') {
+          photoUrl = getDirectImageUrl(document.getElementById('formPhotoUrl').value.trim());
+          if (!photoUrl) {
+            photoType = 'none';
+          }
+        } else {
+          photoType = 'none';
+          photoUrl = '';
+        }
+
+        // Montar dados do documento
+        const data = {
+          name,
+          subtitle,
+          summary,
+          bio,
+          initials,
+          letter,
+          photoType,
+          photoUrl,
+          videoUrl,
+          updatedAt: ()
+        };
+
+        if (docId) {
+          // Editar documento existente
+          await poetisasRef.doc(docId).update(data);
+          showToast('Poetisa atualizada com sucesso!', 'success');
+        } else {
+          // Adicionar novo documento
+          data.createdAt = ();
+          await poetisasRef.doc(targetDocId).set(data);
+          showToast('Poetisa adicionada com sucesso!', 'success');
+        }
+
+        // Recarregar lista
+        await loadPoetisas();
+        closePanel();
+
+      } catch (error) {
+        console.error('Erro ao salvar:', error);
+        showToast('Erro ao salvar poetisa. Tente novamente.', 'error');
+      } finally {
+        setFormDisabled(false);
+        hideLoading();
+      }
+    }
+
+    /* ============================================================
+       EXCLUIR POETISA
+    ============================================================ */
+    function confirmDelete(id) {
+      const p = poetisas.find(x => x.id === id);
+      if (!p) return;
+      deleteTargetId = id;
+      deleteTargetData = p;
+      document.getElementById('confirmMessage').textContent =
+        `Tem certeza que deseja excluir "${p.name}"? Esta ação não pode ser desfeita.`;
+      document.getElementById('confirmOverlay').classList.add('active');
+    }
+
+    async function executeDelete() {
+      if (!deleteTargetId) return;
+
+      const btnDelete = document.getElementById('btnConfirmDelete');
+      btnDelete.disabled = true;
+      btnDelete.textContent = 'Excluindo...';
+      showLoading();
+
+      try {
+        // Excluir documento do 
+        await poetisasRef.doc(deleteTargetId).delete();
+
+        showToast('Poetisa excluída com sucesso.', 'success');
+        await loadPoetisas();
+        closeConfirm();
+
+      } catch (error) {
+        console.error('Erro ao excluir:', error);
+        showToast('Erro ao excluir poetisa. Tente novamente.', 'error');
+      } finally {
+        btnDelete.disabled = false;
+        btnDelete.textContent = 'Excluir';
+        hideLoading();
+      }
+    }
+
+    function closeConfirm() {
+      deleteTargetId = null;
+      deleteTargetData = null;
+      document.getElementById('confirmOverlay').classList.remove('active');
+    }
+
+    /* ============================================================
+       SIDEBAR MOBILE
+    ============================================================ */
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
+    }
+
+    /* ============================================================
+       INICIALIZAÇÃO
+    ============================================================ */
+    document.addEventListener('DOMContentLoaded', function() {
+      initAuth();
+
+      // Se já autenticado, carregar dados imediatamente
+      if (checkAuth()) {
+        document.getElementById('app').style.display = 'flex';
+        loadPoetisas();
+      }
+
+      // === Event Listeners ===
+
+      // Adicionar nova poetisa
+      document.getElementById('btnAdd').addEventListener('click', openAddForm);
+
+      // Fechar painel
+      document.getElementById('panelOverlay').addEventListener('click', closePanel);
+      document.getElementById('panelClose').addEventListener('click', closePanel);
+      document.getElementById('btnFormCancel').addEventListener('click', closePanel);
+
+      // Submeter formulário
+      document.getElementById('poetisaForm').addEventListener('submit', handleFormSubmit);
+
+      // URL de foto — preview ao digitar
+      document.getElementById('formPhotoUrl').addEventListener('input', handlePhotoUrlInput);
+
+      // URL de vídeo — preview ao digitar
+      document.getElementById('formVideoUrl').addEventListener('input', handleVideoUrlInput);
+
+      // Abas de tipo de foto
+      document.querySelectorAll('.photo-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          setPhotoTab(this.dataset.tab);
+        });
+      });
+
+      // Nome → iniciais em tempo real
+      document.getElementById('formName').addEventListener('input', function() {
+        updateInitialsFromName(this.value);
+      });
+
+      // Iniciais manuais → atualizar badge
+      document.getElementById('formInitials').addEventListener('input', function() {
+        const val = this.value.toUpperCase().substring(0, 2);
+        document.getElementById('initialsBadge').textContent = val || '--';
+      });
+
+      // Confirmar exclusão
+      document.getElementById('btnConfirmDelete').addEventListener('click', executeDelete);
+      document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirm);
+      document.getElementById('confirmOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeConfirm();
+      });
+
+      // Logout via  Auth
+      document.getElementById('btnLogout').addEventListener('click', function() {
+        ().signOut().then(() => {
+          location.reload();
+        });
+      });
+
+      // Sidebar mobile
+      document.getElementById('mobileToggle').addEventListener('click', toggleSidebar);
+      document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
+
+      // Tecla Escape para fechar painéis
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          if (document.getElementById('confirmOverlay').classList.contains('active')) {
+            closeConfirm();
+          } else if (document.getElementById('panel').classList.contains('active')) {
+            closePanel();
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
