@@ -94,3 +94,94 @@ Descrever a arquitetura e a implementação do backend.
 - Sem segredos no client-side; segredos sempre em variáveis de ambiente server-side.
 
 **Nova vulnerabilidade a registrar?** _Adicionar aqui._
+
+---
+
+## Vulnerabilidades Típicas de Código Gerado por IA (pesquisa 21/09/2026)
+
+> Seção criada por pesquisa completa (fontes: Veracode GenAI Code Security Report 2026, Cloud
+> Security Alliance, GitHub/Georgia Tech "Vibe Security Radar", CodeRabbit vs Humans 2026,
+> Stanford/Boneh, Socket/Checkmarx — slopsquatting, OWASP LLM Top 10 2025/2026, OWASP Top 10
+> para Aplicações Agentic (ASI) 2026, GitGuardian State of Secrets Sprawl 2026).
+> **Regra 6 do `AGENTS.md`: nenhuma destas pode ser reproduzida no código produzido.**
+
+### Contexto — números (2026)
+
+- **~44–45%** das tarefas com código gerado por IA introduziram vulnerabilidade em testes; 56% de taxa de aprovação em segurança (estável desde 2025, enquanto o volume de código gerado disparou) — Veracode 2026.
+- **XSS: 85% de falha**; **Log injection: 88%**; SQL injection: 17%; algoritmos criptográficos: 13% (Veracode 2026).
+- PRs co-autorados por IA: ~**1,7x mais problemas** no geral, **até 2,74x mais vulnerabilidades**, ~2x mais lacunas de tratamento de erro que PRs humanos (CodeRabbit, 470 PRs, 2026).
+- **74 CVEs** diretamente ligadas a ferramentas de "vibe coding" até março/2026 (Georgia Tech), crescendo de 6 (jan) para 35 (mar) — ~6x em um trimestre.
+- **28,6 milhões de segredos hardcoded** em commits públicos em 2025 (+34% vs 2024); **24.008 segredos únicos só em arquivos de config MCP** no GitHub público (2.117 ainda válidos na detecção) — GitGuardian 2026.
+- Estudo Stanford/Boneh: desenvolvedores usando IA escreveram **código menos seguro em 4 de 5 tarefas**, porém se sentiram **mais confiantes** sobre a segurança.
+
+### Padrões clássicos que IAs repetem (NÃO REPRODUZIR)
+
+1. **Ausência de sanitização de entrada** — a falha mais comum de código LLM, mesmo quando instruído a "escrever código seguro".
+2. **XSS via `innerHTML`/interpolação sem escape** (mesmo padrão das vulnerabilidades #2/#3 deste arquivo).
+3. **SQL injection por concatenação de strings**.
+4. **Segredos hardcoded** (API keys, tokens, senhas) reproduzidos do treino.
+5. **Command injection** via `exec()` com entrada não confiável.
+6. **`eval()`** em dados não confiáveis.
+7. **Hash fraco para senhas** (MD5/SHA1) e criptografia inadequada.
+8. **CORS wildcard** em APIs autenticadas.
+9. **Verificação SSL desabilitada.**
+10. **Path traversal** por caminhos não sanitizados.
+11. **Catch blocks vazios** que engolem erros de segurança silenciosamente.
+12. **Faltas recorrentes**: null checks, verificações de auth, corner cases e log de exceções.
+
+### Vieses típicos de bugs de IA (pesquisa acadêmica 2026)
+
+- Padrões mais comuns (Survey of Bugs in AI-Generated Code, arXiv 2512.05239): **Misinterpretation** (mal-entendido do pedido — o mais comum), **Missing Corner Cases**, **Hallucinated Object**, **Incomplete Generation**, **Wrong Attribute**.
+- **"Seductive simplicity"**: o código parece consistente, compila e executa — mas está errado/inseguro. **Obriga verificação explícita** (ver `SKILL.md`, regra de verificação).
+- Modelos treinados em repositórios públicos reproduzem padrões inseguros **com a mesma confiança** que reproduzem padrões seguros.
+
+### Supply chain — dependências alucinadas (slopsquatting)
+
+- **~20% dos pacotes recomendados por LLMs não existem** (Socket, 576 mil amostras Python/JS); 43% dos nomes alucinados se repetem em 10 execuções — previsíveis para atacantes.
+- Atacantes monitoram saídas de Copilot/Claude/Cursor e **registram os nomes alucinados em horas** no npm/PyPI (ataque ativo em 2025–2026).
+- **Mitigação**: toda dependência sugerida por IA é **não confiável até verificação**; conferir existência/histórico/downloads; lockfiles; pinagem de versões por hash; desconfiar de nomes novos/genéricos.
+
+### OWASP LLM Top 10 (2025/2026) — resumo aplicável
+
+| Código | Risco | Lição para este projeto |
+|---|---|---|
+| LLM01 | **Prompt Injection** (mais explorada; variante indireta via conteúdo externo: docs, PRs, páginas) | Conteúdo externo lido por agente/LLM nunca é instrução confiável |
+| LLM02 | Descoberta de Informação Sensível | Segredos fora do alcance dos agentes |
+| LLM03 | Supply Chain (plugins, prompts, dependências comprometidos) | Verificar dependências (slopsquatting acima) |
+| LLM04 | Envenenamento de dados/modelo | Validar dados antes do DOM/processamento |
+| LLM05 | Tratamento impróprio de saída | Saída de IA = dado não confiável até validação |
+| LLM06 | **Agency excessiva** (agente com poder demais) | Escopo mínimo; ações sensíveis exigem aprovação |
+| LLM07 | Vazamento de prompt de sistema / contexto oculto | Nunca colocar segredos/regras sensíveis em contexto exposto |
+| LLM08 | Fraquezas de vetores/embeddings (RAG) | Não aplicável hoje (sem RAG) — monitorar |
+| LLM09 | Desinformação | Verificar conteúdo factual gerado |
+| LLM10 | Consumo descontrolado (custo) | Limites de operações/leitura |
+
+### OWASP Top 10 para Agentes (ASI, 2026) — resumo
+
+ASI01 Goal Hijack (injecção + autonomia), ASI02 Tool Misuse, ASI03 Abuso de identidade/privilégio, ASI04 Supply Chain agentic, ASI05 Execução de código inesperada, ASI06 Envenenamento de memória/contexto, ASI07–ASI10 novas classes fora de LLMs tradicionais (incluindo ASI08 Cascading Failures, ASI09 Exploração de confiança humano-agente e ASI10 Rogue Agents). **Lições**: limitar ferramentas/credenciais por tarefa; auditar chamadas de ferramentas; sandbox; exigir confirmação em operações destrutivas.
+
+### Ataques reais a agentes de código (2025–2026)
+
+- **CamoLeak (CVE-2025-59145, CVSS 9.6)**: exfiltrou segredos e código de repositórios privados via PR oculto no GitHub Copilot Chat.
+- **Comment and Control (abr/2026)**: três agentes (Claude Code, Gemini CLI, Copilot Agent) vazaram tokens de CI (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`) via comentário/PR/título de ticket com instruções ocultas.
+- **Regra prática**: conteúdo externo (issues, PRs, docs, respostas de API) é **não confiável**; limitar as credenciais que o agente alcança (mínimo privilégio), não confiar em filtragem de saída como defesa principal.
+
+### Notas de segurança específicas do Supabase (arquitetura alvo)
+
+> Registradas aqui porque formam a base da proteção do novo backend (ver plano).
+
+- **Chave `anon`/publishable (`sb_publishable_`) é pública por design** (fica no browser) — a proteção real é **100% RLS (deny-by-default)**, nunca o segredo da chave. Legacy `anon`/`service_role` deprecados até o fim de 2026.
+- **Chave `secret`/`service_role` NUNCA no client-side** — ela tem `BYPASSRLS`; expor = banco inteiro comprometido.
+- Habilite RLS em **toda tabela exposta** (schema `public` alcançável pela Data API) e **force** para donos. Política por operação (SELECT/INSERT/UPDATE/DELETE) e por papel (`anon`/`authenticated`).
+- "Expor tabela à Data API" ≠ RLS: o grant libera o endpoint; a política decide quais linhas são visíveis.
+- Restringir **CORS** no dashboard às origens do site (nunca `*`).
+- Revisar/revogar grants `anon`/`authenticated` onde não forem necessários.
+- Testar políticas com `supabase test db` (pgTAP) — uma asserção por operação e por papel.
+
+### Práticas mínimas ampliadas (nunca remover — juntamente com as originais)
+
+- **Tratar toda saída de IA como não confiável** e verificar antes de aceitar (código, SQL, dependências, config).
+- **Nunca hardcode segredos**; segredos só em variáveis de ambiente server-side.
+- **Verificar dependências** sugeridas por IA (existência, histórico, downloads) e fixar versões por lockfile/hash.
+- **Revisão humana obrigatória** em código de autenticação, criptografia e qualquer área sensível.
+- **Forçar verificação** em toda mudança de schema/RLS (testes de política).
