@@ -103,7 +103,7 @@ create policy "poetisas admin write" on poetisas
 | 5 | Config pública | **Por design** (anon/publishable key); barreira real = **RLS deny-by-default + policies por operação/papel**; secrets nunca no client |
 | 6 | Sem CSP | `vercel.json` com CSP restrito (`default-src 'self'`), `nosniff`, Referrer-Policy |
 | 7 | Código morto/sensível | Remoção de branches não usados e constantes desnecessárias; admin reescrito |
-| 8 | Sem rate limiting / força bruta | **Google OAuth** gerencia; CORS restrito; monitoração via log de auditoria |
+| 8 | Sem rate limiting / força bruta | **Google OAuth** gerencia credenciais; monitoração via log de auditoria do Supabase. Nota: a Data API do Supabase não permite restringir CORS no dashboard (header é `*` fixo — não há "Allowed Origins"); por isso a defesa real é 100% RLS |
 | 9 | Validação client-side como única defesa | **RLS server-side** é a defesa real; validação client = UX, não segurança |
 | 10 | CDN sem política de versão | Versões fixas por CDN + revisão registrada (ver `SKILL.md`) |
 | 11 | Handler com dado não escapado | `addEventListener` + `dataset`/closure; nunca interpolar dados em handler |
@@ -235,7 +235,7 @@ o Auth responde `400 validation_failed — Unsupported provider: provider is not
 | 1 | Migração SQL + RLS + seed (`001_init.sql`) | ✅ feito (aplicada; verificado via API) |
 | 2 | `supabase-config.js` + `acervo.js` (leitura) | ✅ feito e operando (dados reais no site) |
 | 3 | `admin.html` completo (login Google + CRUD + capas) | ✅ **feito e validado** (login via Google + allowlist operando) |
-| 4 | Segurança (CSP/Vercel, CORS, auditoria RLS) | 🔶 parcial — `vercel.json` (CSP/headers) ✅ pronto; falta **CORS restrito no dashboard** (manual) e **publicar no Vercel** |
+| 4 | Segurança (CSP/Vercel, auditoria RLS) | 🔶 parcial — `vercel.json` (CSP/headers) ✅ pronto; falta **publicar no Vercel** p/ headers saírem do ar. ~~CORS do dashboard~~ removido: **a Data API do Supabase não permite restringir CORS** (sem "Allowed Origins"; header `*` fixo — docs + discussões GitHub). RLS segue como barreira real |
 | 5 | Documentação (`requisitos.md`, `memoria.md`, `backend.md`) | ✅ feito (auditoria 25/09: vuln #4, Inter, admin sem innerHTML, plano-alteracoes — todos tratados) |
 
 ---

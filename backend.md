@@ -54,7 +54,7 @@ Arquitetura e implementação do back-end do site **"Memórias da Poesia Popular
 
 ### 5. Config pública + regras de banco como única barreira (ALTA)
 - **Problema**: chave `anon` é pública por design; proteção não pode depender do segredo da chave.
-- **Prevenção (aplicada)**: chave `secret`/`service_role` nunca no client-side; barreira real = **RLS deny-by-default + policies por operação/papel**; CORS restrito no dashboard.
+- **Prevenção (aplicada)**: chave `secret`/`service_role` nunca no client-side; barreira real = **RLS deny-by-default + policies por operação/papel**. Nota (25/09): a Data API do Supabase **não permite restringir CORS no dashboard** (header `Access-Control-Allow-Origin` é `*` fixo; sem "Allowed Origins" — confirmado em docs e discussões do GitHub). Como leitura pública já é o objetivo e escrita exige login+allowlist, o wildcard não enfraquece a proteção real.
 
 ### 6. Ausência de cabeçalhos de segurança / CSP (MÉDIA)
 - **Prevenção (aplicada)**: CSP restrito (`default-src 'self'`), `X-Content-Type-Options: nosniff`, `Referrer-Policy` no deploy.
@@ -64,7 +64,7 @@ Arquitetura e implementação do back-end do site **"Memórias da Poesia Popular
 - **Prevenção (aplicada)**: remoção de código morto (ex.: `AUTH_KEY`, branch `upload`); sem armazenar segredos/sessões em constantes client-side.
 
 ### 8. Sem rate limiting ou proteção contra força bruta (MÉDIA)
-- **Prevenção (aplicada)**: **Google OAuth** gerencia credenciais; CORS restrito; monitoração via logs de auditoria do Supabase.
+- **Prevenção (aplicada)**: **Google OAuth** gerencia credenciais; monitoração via logs de auditoria do Supabase. (CORS do dashboard não é configurável — ver notícia #5.)
 
 ### 9. Confiança apenas na validação client-side (MÉDIA)
 - **Prevenção (aplicada)**: a defesa real é server-side (RLS deny-by-default); validação no client é apenas UX.
@@ -161,7 +161,7 @@ ASI01 Goal Hijack (injecção + autonomia), ASI02 Tool Misuse, ASI03 Abuso de id
 - **Chave `secret`/`service_role` NUNCA no client-side** — ela tem `BYPASSRLS`; expor = banco inteiro comprometido.
 - Habilite RLS em **toda tabela exposta** (schema `public` alcançável pela Data API) e **force** para donos. Política por operação (SELECT/INSERT/UPDATE/DELETE) e por papel (`anon`/`authenticated`).
 - "Expor tabela à Data API" ≠ RLS: o grant libera o endpoint; a política decide quais linhas são visíveis.
-- Restringir **CORS** no dashboard às origens do site (nunca `*`).
+- Restringir **CORS** nas suas próprias APIs sempre que possível. (Exceção documentada neste projeto: a **Data API do Supabase não expõe configuração de CORS** — header `*` fixo; mitigado por RLS deny-by-default.)
 - Revisar/revogar grants `anon`/`authenticated` onde não forem necessários.
 - Testar políticas com `supabase test db` (pgTAP) — uma asserção por operação e por papel.
 

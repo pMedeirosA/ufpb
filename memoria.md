@@ -54,7 +54,7 @@ Site **"Memórias da Poesia Popular"** — acervo digital das poetisas da litera
 
 ### Pendente
 - Req 06 — conteúdo da seção Comentários (painel já está montado, vazio, sem conteúdo fictício).
-- Fase 4 do plano (`plano-supabase.md` §10): **limitar CORS no dashboard** (`Authentication → URL Configuration` é config local; o CORS global `*` precisa ser restringido no painel Supabase — ação manual) e **publicar no Vercel** (decidir domínio final; CSP/headers do `vercel.json` já pronto).
+- Fase 4 do plano (`plano-supabase.md` §10): **publicar no Vercel** (decidir domínio final; CSP/headers do `vercel.json` já pronto). **CORS do dashboard removido do plano: a Data API do Supabase não tem configurável ("Allowed Origins" não existe — header é `*` fixo; confirmado em docs + discussões GitHub 2026).** Proteção real continua sendo o RLS (escrita só com login Google + allowlist).
 
 ## Decisões-chave
 - **Back-end do projeto = Supabase do `plano-supabase.md`** (escolha explícita do usuário). Sem o back do build novo (sem Storage, sem tabela `obras`, sem `status`, campos `video_url`/`covers` mantidos no schema do plano).
