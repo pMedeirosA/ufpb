@@ -6,12 +6,23 @@
 >
 > Fonte de rigor: `AGENTS.md` (Regras 5, 6, 7, 8, 9), `design.md` (conformidade visual),
 > `memoria.md` (contexto), `SKILL.md` (documento canônico ao iniciar backend — aplicável por
-> parácia, pois toca em CSS/HTML), `requisitos.md` (pedidos da chefia).
+> analogia, pois toca em CSS/HTML), `requisitos.md` (pedidos da chefia).
 >
-> ⚠️ **Nota de transparência:** a imagem anexada pela chefia não pôde ser exibida nesta sessão
-> (limitação de entrada de imagem do agente). A identificação do elemento foi feita via código:
-> o **pássaro decorativo** do hero é a xilogravura **`site/elementos/siteWix13.png`**
-> (seletor `.decor-hero-bird`, `alt="Decor Pássaro"`), já presente no topo do `index.html`.
+> ⚠️ **Nota de transparência (desatualizada):** a imagem anexada pela chefia não pôde ser
+> exibida nesta sessão (limitação de entrada de imagem do agente). A identificação do elemento
+> foi feita via código (ver estado atual abaixo).
+>
+> ⚠️ **Estado atual do projeto (25/09/2026):** a página foi reestruturada e as referências
+> originais deste plano existem **apenas aqui**, não mais no código:
+>   - O pássaro decorativo (`.decor-hero-bird` / `siteWix13.png`) **não existe mais** — o hero
+>     atual é `.home-hero` com a xilogravura `matriz-memoria.svg`.
+>   - A folha de estilos é **`site/visual/public.css`** (não existe `styles.css`).
+>   - Os scripts são **`site/back/*.js`** (não existe `script.js`).
+> O plano permanece **válido como intenção** (A/B/C/D), mas a execução — quando aprovada —
+> deve ser re-analiada contra o código atual. Itens C e D (rodapé sans-serif + textos de leitura
+> em sans-serif) **já estão de fato implementados**: o projeto usa `Inter` (Google Fonts,
+> carregada nas 5 páginas) e o rodapé já segue `var(--font-body)`. Segue suspenso conforme
+> Regra 9 até aprovação explícita.
 
 ---
 
@@ -36,13 +47,15 @@ JacksonXilogravura nos títulos).
 ## 2. A — Animação do pássaro no hero
 
 ### 2.1 Estado atual (verificado no código)
-- **Elemento:** `<img src="../elementos/siteWix13.png" alt="Decor Pássaro"
-  class="decor-img decor-hero-bird">`, no `<section class="hero">` do `index.html`.
-- **CSS atual** (`site/visual/styles.css`, ~linha 1879):
-  `.decor-hero-bird { width: clamp(60px, 10.5vw, 200px); top: -1.6vw; right: -2.6vw;
-  transform: translate(10.05vw, 4.32vw); }` → o pássaro está **estático** (sem animação).
-- **Media queries existentes:** em `max-width: 768px` os elementos decorativos são ocultados
-  (`decor-img` / bird não aparece no mobile — decisão correta a preservar).
+- **Elemento:** ~~`<img src="../elementos/siteWix13.png" alt="Decor Pássaro"
+  class="decor-img decor-hero-bird">` no `<section class="hero">` do `index.html`~~ —
+  **não existe mais**. O hero atual é `.home-hero` (com `matriz-memoria.svg`).
+- **CSS atual:** só existe **`site/visual/public.css`** (não há `styles.css`); não há
+  `.decor-hero-bird` nem classe `hero` em uso.
+- **Media queries existentes:** em `public.css`, retorno `≤768px` os elementos decorativos são
+  ocultados (`decor-img` some no mobile — decisão correta a preservar).
+- **Consequência:** o item A precisa ser **redesenhado** quando a chefia aprovar o voo —
+  reutilizar `matriz-memoria.svg` (bird-memória) em faixa fixa, em vez do `siteWix13.png`.
 
 ### 2.2 Objetivo
 O pássaro deve **cruzar a tela, da direita para a esquerda** (como um voo decorativo contínuo),
@@ -60,7 +73,7 @@ rolagem** (o elemento não deve "descer" junto com o conteúdo ao rolar — comp
 | Mobile | Oculto em `≤768px` (mantém comportamento atual — decorativos somem) |
 | Interação/UX | `pointer-events: none` (não bloqueia cliques) · `z-index` abaixo do texto/CTAs |
 | Acessibilidade | Novo `@media (prefers-reduced-motion: reduce)` → desativa o voo (vira imagem estática) |
-| Visual | Reutiliza `siteWix13.png` (nenhuma nova asset); respeita paleta/opacidade do `design.md` |
+| Visual | Reutiliza asset existente do hero (`matriz-memoria.svg`); nenhuma nova asset; respeita paleta/opacidade do `design.md` |
 
 ### 2.4 Implementação sugerida (a executar só após aprovação)
 
@@ -183,9 +196,9 @@ como padrão, com exceções óbvias garantidas só onde o `design.md` mandar ma
 
 | Arquivo | Ação |
 |---|---|
-| `site/estrutura/index.html` | ↩️ possivelmente: contêiner-faixa do pássaro no hero (opcional — pode sair só via CSS se o elemento atual servir) |
-| `site/visual/styles.css` | ↩️ A: keyframes `bird-flight` + faixa fixa + `prefers-reduced-motion`; B: media queries de reflowo; C: `.footer *` sans |
-| `site/visual/script.js` | ✏️ (se necessário) hook para medir altura do header fixo / `ResizeObserver` |
+| `site/estrutura/index.html` | ↩️ possivelmente: contêiner-faixa do pássaro no hero (opcional — pode sair só via CSS) |
+| `site/visual/public.css` | ↩️ A: keyframes `bird-flight` + faixa fixa + `prefers-reduced-motion`; B: media queries de reflowo; C: `.footer *` sans (já em uso) |
+| `site/back/acervo.js` | ✏️ (se necessário) hook para medir altura do header fixo / `ResizeObserver` |
 | `design.md` | ✏️ registrar regra D + seção de responsividade |
 | `memoria.md` | ✏️ decisão da chefia (data) |
 | `requisitos.md` | ✏️ marcar Req como cumprido **após execução aprovada** (Regra 8) |
@@ -199,7 +212,7 @@ como padrão, com exceções óbvias garantidas só onde o `design.md` mandar ma
   rodapé legível.
 - **Regra 11 vulnerabilidades** (`backend.md`): este é trabalho **estático (HTML/CSS/JS)**; sem
   backend, sem RLS, sem input do usuário → nenhuma das 11 vulnerabilidades se aplica. Mantém-se
-  escapo/validação nas demais telas (fuera de escopo aqui).
+  escape/validação nas demais telas (fora de escopo aqui).
 - **UX**: animação contínua pode incomodar → mitigação por `prefers-reduced-motion`. Opcional:
   pausar no `hover`/foco (a definir).
 - **Performance**: reutiliza asset existente, sem novas requisições de imagem.

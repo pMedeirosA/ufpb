@@ -9,8 +9,8 @@
    =================================== */
 
 const SUPABASE_CONFIG = {
-  url: '',
-  anonKey: ''
+  url: 'https://ewhbhcvwibutqflymvgz.supabase.co',
+  anonKey: 'sb_publishable_M92QllArJlGMKbB2n9aWfA_iLXcEJsl'
 };
 
 function supabaseEstaConfigurado() {

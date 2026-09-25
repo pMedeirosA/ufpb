@@ -1018,15 +1018,6 @@
     }
 
     /**
-     * Escapa HTML para prevenir XSS
-     */
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    /**
      * Converte URL do Google Drive para link direto de imagem
      * drive.google.com/file/d/ID/view -> drive.google.com/uc?export=view&id=ID
      */
@@ -1219,6 +1210,10 @@
     /* ============================================================
        RENDERIZAÇÃO DOS CARTÕES
     ============================================================ */
+    // Ícones fixos (constantes estáticas — sem dados dinâmicos)
+    const ICON_EDIT = '<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    const ICON_DELETE = '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+
     function renderCards() {
       const grid = document.getElementById('cardGrid');
       const empty = document.getElementById('emptyState');
@@ -1229,46 +1224,84 @@
       count.textContent = poetisas.length + (poetisas.length === 1 ? ' poetisa' : ' poetisas');
 
       if (poetisas.length === 0) {
-        grid.innerHTML = '';
+        grid.replaceChildren();
         empty.style.display = 'block';
         return;
       }
 
       empty.style.display = 'none';
 
-      grid.innerHTML = poetisas.map(function (p) {
-        const hasPhoto = p.photoUrl && p.photoType !== 'none';
-        const avatarContent = hasPhoto
-          ? '<img src="' + escapeHtml(p.photoUrl) + '" alt="' + escapeHtml(p.name) + '" loading="lazy">'
-          : escapeHtml(p.initials || '--');
+      const cards = poetisas.map(function (p) {
+        const card = document.createElement('div');
+        card.className = 'poetisa-card';
+        card.dataset.id = p.id;
 
-        let badges = '';
-        if (p.photoType === 'url') badges += '<span class="card-badge url">🔗 Imagem</span>';
-        if (p.videoUrl) badges += '<span class="card-badge video">▶ Vídeo</span>';
-        const coversCount = Array.isArray(p.covers) ? p.covers.length : 0;
-        if (coversCount) {
-          badges += '<span class="card-badge">' + coversCount + ' capa' + (coversCount === 1 ? '' : 's') + '</span>';
+        const avatar = document.createElement('div');
+        avatar.className = 'card-avatar';
+        if (p.photoUrl && p.photoType !== 'none') {
+          const img = document.createElement('img');
+          img.src = p.photoUrl;
+          img.alt = p.name;
+          img.loading = 'lazy';
+          avatar.append(img);
+        } else {
+          avatar.textContent = p.initials || '--';
         }
 
-        return (
-          '<div class="poetisa-card" data-id="' + escapeHtml(p.id) + '">' +
-            '<div class="card-avatar">' + avatarContent + '</div>' +
-            '<div class="card-body">' +
-              '<div class="card-name">' + escapeHtml(p.name) + '</div>' +
-              '<div class="card-subtitle">' + escapeHtml(p.subtitle || '') + '</div>' +
-              (badges ? '<div class="card-meta-badges">' + badges + '</div>' : '') +
-            '</div>' +
-            '<div class="card-actions">' +
-              '<button class="card-btn card-btn-edit" type="button" data-action="edit" title="Editar">' +
-                '<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
-              '</button>' +
-              '<button class="card-btn card-btn-delete" type="button" data-action="delete" title="Excluir">' +
-                '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' +
-              '</button>' +
-            '</div>' +
-          '</div>'
-        );
-      }).join('');
+        const body = document.createElement('div');
+        body.className = 'card-body';
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'card-name';
+        nameDiv.textContent = p.name;
+        const subtitleDiv = document.createElement('div');
+        subtitleDiv.className = 'card-subtitle';
+        subtitleDiv.textContent = p.subtitle || '';
+        body.append(nameDiv, subtitleDiv);
+
+        const badges = [];
+        if (p.photoType === 'url') badges.push({ label: '🔗 Imagem', mod: ' url' });
+        if (p.videoUrl) badges.push({ label: '▶ Vídeo', mod: ' video' });
+        const coversCount = Array.isArray(p.covers) ? p.covers.length : 0;
+        if (coversCount) {
+          badges.push({ label: coversCount + ' capa' + (coversCount === 1 ? '' : 's'), mod: '' });
+        }
+        if (badges.length) {
+          const meta = document.createElement('div');
+          meta.className = 'card-meta-badges';
+          badges.forEach(function (badge) {
+            const badgeEl = document.createElement('span');
+            badgeEl.className = 'card-badge' + badge.mod;
+            badgeEl.textContent = badge.label;
+            meta.append(badgeEl);
+          });
+          body.append(meta);
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'card-btn card-btn-edit';
+        editBtn.dataset.action = 'edit';
+        editBtn.title = 'Editar';
+        editBtn.setAttribute('aria-label', 'Editar ' + p.name);
+        editBtn.innerHTML = ICON_EDIT;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'card-btn card-btn-delete';
+        deleteBtn.dataset.action = 'delete';
+        deleteBtn.title = 'Excluir';
+        deleteBtn.setAttribute('aria-label', 'Excluir ' + p.name);
+        deleteBtn.innerHTML = ICON_DELETE;
+
+        actions.append(editBtn, deleteBtn);
+        card.append(avatar, body, actions);
+        return card;
+      });
+
+      grid.replaceChildren.apply(grid, cards);
     }
 
     /* ============================================================
@@ -1593,7 +1626,7 @@
     function renderCoversList() {
       const list = document.getElementById('coversList');
       if (!list) return;
-      list.innerHTML = '';
+      list.replaceChildren();
       covers.forEach(function (c, index) {
         const row = document.createElement('div');
         row.className = 'covers-row';

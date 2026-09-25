@@ -1,0 +1,23 @@
+# Dependências
+node_modules/
+
+# Segredos / ambiente (.env*); supabase-config.js é público por design e vai versionado
+.env
+.env.*
+!.env.example
+
+# Builds / deploy
+dist/
+build/
+.vite/
+
+# Sistema operacional
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Downloads e extras locais fora do site
+Downloads/
+
+# Logs
+*.log

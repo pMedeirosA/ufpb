@@ -166,11 +166,10 @@
 
   function convertToEmbed(url) {
     if (!url) return null;
-    var match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+    var match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
     if (match) return 'https://www.youtube.com/embed/' + match[1];
     match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
     if (match) return 'https://player.vimeo.com/video/' + match[1];
-    if (url.indexOf('embed') !== -1 || url.indexOf('player') !== -1) return url;
     return null;
   }
 

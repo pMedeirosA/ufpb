@@ -122,6 +122,26 @@ create policy "poetisas admin write" on poetisas
 **Visual**: 100% conforme `design.md` (sidebar `#2C1810`, terracota `#C4513D`, cards,
 formulário 520px, toast, diálogo de confirmação de exclusão).
 
+### 5.1 Configuração externa — provedor Google (para o login funcionar)
+
+O "Entrar com Google" exige o provedor **habilitado** no projeto Supabase; enquanto não estiver,
+o Auth responde `400 validation_failed — Unsupported provider: provider is not enabled`:
+
+1. **Supabase** → `Authentication` → `Sign In / Providers` → **Google** → ativar o toggle
+   **"Enable Sign in with Google"** e colar `Client ID` + `Client Secret`.
+2. **Google Cloud Console** (`console.cloud.google.com`):
+   - Criar/selecionar projeto → **APIs & Services** → **OAuth consent screen**
+     (External; escopos `email` + `profile`; adicionar o e-mail de teste).
+   - **Credentials** → **+ Create credentials** → **OAuth client ID** → tipo **Web application**.
+   - **Authorized redirect URIs**: `https://ewhbhcvwibutqflymvgz.supabase.co/auth/v1/callback`
+     (idêntico ao acima — é o URL para o Google devolver o login ao Supabase).
+   - Copiar **Client ID** e **Client Secret** → colar no passo 1 → **Save**.
+3. **Supabase → Authentication → URL Configuration**: conferir `Site URL`; ao testar o admin
+   localmente, servir via HTTP (`http://localhost:PORTA`) e adicionar essa origem em
+   `Redirect URLs` — protocolo `file://` quebra o retorno do OAuth.
+4. **Allowlist**: o e-mail do Google precisa estar em `admin_emails` (senão o painel abre,
+   mas nega acesso — deny-by-default).
+
 ---
 
 ## 6. Fluxo do site público
@@ -198,12 +218,12 @@ formulário 520px, toast, diálogo de confirmação de exclusão).
 
 | Arquivo | Ação |
 |---|---|
-| `site/back/supabase-config.js` | ✅ criado (URL + anon key; placeholder) |
+| `site/back/supabase-config.js` | ✅ preenchido (projeto real `ewhbhcvwibutqflymvgz`) |
 | `site/estrutura/admin.html` | ✅ reescrito (Supabase Auth + CRUD + capas) |
 | `site/back/{acervo,home,biografias,poetisa,common}.js` | ✅ criados (leitura + fallback) |
 | `site/estrutura/*.html` | ✅ páginas públicas com o novo visual |
-| `supabase/migrations/001_init.sql` | 🆕 migração + seed + RLS (aplicar no console) |
-| `vercel.json` | 🆕 CSP/security headers |
+| `supabase/migrations/001_init.sql` | ✅ criado e **aplicado** via SQL Editor (chema + RLS + seed); seed idempotente (só popula tabela vazia) |
+| `site/vercel.json` | ✅ criado com CSP (default-src 'self' + Google Fonts + jsdelivr + Supabase connect + YouTube/Vimeo frame), `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` |
 
 ---
 
@@ -211,12 +231,12 @@ formulário 520px, toast, diálogo de confirmação de exclusão).
 
 | Fase | Entrega | Status |
 |---|---|---|
-| 0 | Conta Supabase + projeto + config (interface) | ⏳ pendente (ação da chefia) |
-| 1 | Migração SQL + RLS + seed (`001_init.sql`) | ⏳ pendente |
-| 2 | `supabase-config.js` + `acervo.js` (leitura) | ✅ feito (com fallback) |
-| 3 | `admin.html` completo (login Google + CRUD + capas) | ✅ feito (aguarda Fase 0/1 para validar) |
-| 4 | Segurança (CSP/Vercel, CORS, auditoria RLS) | ⏳ pendente |
-| 5 | Documentação (`requisitos.md`, `memoria.md`, `backend.md`) | ✅ feito |
+| 0 | Conta Supabase + projeto + config | ✅ feito (projeto criado; `supabase-config.js` preenchido) |
+| 1 | Migração SQL + RLS + seed (`001_init.sql`) | ✅ feito (aplicada; verificado via API) |
+| 2 | `supabase-config.js` + `acervo.js` (leitura) | ✅ feito e operando (dados reais no site) |
+| 3 | `admin.html` completo (login Google + CRUD + capas) | ✅ **feito e validado** (login via Google + allowlist operando) |
+| 4 | Segurança (CSP/Vercel, CORS, auditoria RLS) | 🔶 parcial — `vercel.json` (CSP/headers) ✅ pronto; falta **CORS restrito no dashboard** (manual) e **publicar no Vercel** |
+| 5 | Documentação (`requisitos.md`, `memoria.md`, `backend.md`) | ✅ feito (auditoria 25/09: vuln #4, Inter, admin sem innerHTML, plano-alteracoes — todos tratados) |
 
 ---
 
