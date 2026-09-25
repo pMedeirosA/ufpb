@@ -1198,7 +1198,23 @@
           .select(POETISAS_SELECT)
           .order('name', { ascending: true });
         if (error) throw error;
-        poetisas = Array.isArray(data) ? data : [];
+        poetisas = Array.isArray(data)
+          ? data.map(row => ({
+              id: row.id,
+              name: row.name,
+              initials: row.initials,
+              letter: row.letter,
+              subtitle: row.subtitle,
+              summary: row.summary,
+              bio: row.bio,
+              photoType: row.photo_type || 'none',
+              photoUrl: row.photo_url || '',
+              videoUrl: row.video_url || '',
+              covers: Array.isArray(row.covers) ? row.covers : [],
+              createdAt: row.created_at,
+              updatedAt: row.updated_at
+            }))
+          : [];
         renderCards();
       } catch (error) {
         console.error('Erro ao carregar poetisas:', error);
