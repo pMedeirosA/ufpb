@@ -47,16 +47,17 @@ Site **"Memórias da Poesia Popular"** — acervo digital das poetisas da litera
   - **Vulnerabilidade #4 corrigida** (`backend.md`): `acervo.js`→`convertToEmbed` não aceita mais URL arbitrária com "embed"/"player"; só YouTube (watch/embed/shorts/youtu.be) e Vimeo via regex, senão `null` (guarda `!embedUrl` em `poetisa.js`); alinhado ao `getEmbedUrl` do admin.
   - **Fonte Inter carregada** (`design.md`): Google Fonts adicionado nas 5 páginas públicas (antes a `--font-body` caía no fallback Segoe).
   - **Admin sem innerHTML de dados**: `renderCards` e `renderCoversList` reescritos com DOM API; `escapeHtml` (agora morto) removido. Únicos `innerHTML` restantes = ícones SVG **constantes** (edit/delete), sem dados dinâmicos.
-  - **Fase 4 parcial**: `site/vercel.json` criado com `Content-Security-Policy` (self + Google Fonts + jsdelivr + Supabase connect + YouTube/Vimeo frame), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`.
+  - **Fase 4 parcial**: `site/vercel.json` criado como **template** de headers de segurança (`Content-Security-Policy` self + Google Fonts + jsdelivr + Supabase connect + YouTube/Vimeo frame, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`) — a portar para o host final.
   - **`plano-alteracoes-visuais.md`** atualizado: `.decor-hero-bird`/`siteWix13.png`, `styles.css` e `script.js` **não existem mais**; itens C/D já estão implementados (Inter + rodapé `--font-body`); plano segue **suspenso** (Regra 9).
   - **Google Drive corrigido (25/09):** hotlink do Drive exige cuidado — `drive.usercontent.google.com/download` e `uc?export=view` respondem **403 para User-Agent de navegador real** (anti-hotlink). `getDirectImageUrl` (`acervo.js` + `admin.html`) agora gera `https://lh3.googleusercontent.com/d/<ID>` (responder 200 image/jpeg com UA/Origin/Referer de navegador; testado) e **re-normaliza links antigos já salvos** na leitura (foto e capas).
   - **Bug admin — form lembrado ao editar (25/09):** `loadPoetisas` usava as linhas cruas do Supabase (snake_case `photo_type`/`photo_url`), mas o resto do admin lia camelCase (`photoType`/`photoUrl`) → toda edição abria como "Nenhuma" e perdia foto/vídeo/capas (e cards nunca mostravam imagem). Corrigido com **mapeamento `snake_case → camelCase`** em `loadPoetisas`.
 
 ### Pendente
 - Req 06 — conteúdo da seção Comentários (painel já está montado, vazio, sem conteúdo fictício).
-- Fase 4 do plano (`plano-supabase.md` §10): **publicar no Vercel** (decidir domínio final; CSP/headers do `vercel.json` já pronto). **CORS do dashboard removido do plano: a Data API do Supabase não tem configurável ("Allowed Origins" não existe — header é `*` fixo; confirmado em docs + discussões GitHub 2026).** Proteção real continua sendo o RLS (escrita só com login Google + allowlist).
+- Fase 4 do plano (`plano-supabase.md` §10): **deploy de produção com domínio próprio** (hospedagem a definir — **não será Vercel**, decisão do usuário 25/09/2026); aplicar os headers do `site/vercel.json` (template) conforme o host escolhido. **CORS do dashboard removido do plano: a Data API do Supabase não tem configurável ("Allowed Origins" não existe — header é `*` fixo; confirmado em docs + discussões GitHub 2026).** Proteção real continua sendo o RLS (escrita só com login Google + allowlist).
 
 ## Decisões-chave
+- **Deploy final = domínio próprio, hospedagem a definir — NÃO será Vercel** (decisão da chefia, 25/09/2026). O `site/vercel.json` vira **template** de headers a portar para o host escolhido.
 - **Back-end do projeto = Supabase do `plano-supabase.md`** (escolha explícita do usuário). Sem o back do build novo (sem Storage, sem tabela `obras`, sem `status`, campos `video_url`/`covers` mantidos no schema do plano).
 - Card individual de poetisa incluído (`poetisa.html?slug=...`).
 - Fallback estático de 8 poetisas garante que o site nunca quebra sem o Supabase configurado.

@@ -12,7 +12,7 @@ Arquitetura e implementação do back-end do site **"Memórias da Poesia Popular
 - Linguagem: HTML/CSS/JS vanilla (sem framework).
 - Banco de dados: **PostgreSQL (Supabase)** — tabela `poetisas` (+ `admin_emails`).
 - Autenticação: **Google OAuth** via Supabase Auth; autorização por allowlist em `admin_emails` (deny-by-default).
-- Deploy: estático (Vercel ou hospedagem atual) + `vercel.json` para CSP/security headers.
+- Deploy futuro: site estático com **domínio próprio (hospedagem a definir — sem Vercel)**; `site/vercel.json` é apenas o **template** dos headers de segurança a portar para o host escolhido.
 
 ## API / Endpoints
 - Sem API própria. As páginas usam a **Data API do Supabase** (`/rest/v1/...`) direto do navegador com a chave `anon` (pública por design). A barreira real é o **RLS deny-by-default**.
@@ -28,7 +28,7 @@ Arquitetura e implementação do back-end do site **"Memórias da Poesia Popular
 - Tabela `admin_emails`: allowlist de e-mails.
 
 ## Deploy
-- Estático; Supabase gerencia banco/auth. CSP restrito (`default-src 'self'`), `nosniff`, Referrer-Policy em `vercel.json`.
+- Estático (domínio próprio, hospedagem a definir); Supabase gerencia banco/auth. Aplicar CSP (`default-src 'self'`), `nosniff`, Referrer-Policy conforme as regras do host final (o `site/vercel.json` atual é o template dos headers).
 
 ---
 

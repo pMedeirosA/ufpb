@@ -101,7 +101,7 @@ create policy "poetisas admin write" on poetisas
 | 2/3 | XSS → innerHTML sem escape | `escapeHtml` em **toda** string do banco antes do DOM (site e admin) |
 | 4 | Embed por URL livre (iframe arbitrário) | `convertToEmbed`: somente Youtube/Vimeo validados por regex |
 | 5 | Config pública | **Por design** (anon/publishable key); barreira real = **RLS deny-by-default + policies por operação/papel**; secrets nunca no client |
-| 6 | Sem CSP | `vercel.json` com CSP restrito (`default-src 'self'`), `nosniff`, Referrer-Policy |
+| 6 | Sem CSP | Aplicar CSP restrito (`default-src 'self'`) + `nosniff` + Referrer-Policy **conforme o host final** (deploy sem Vercel; `site/vercel.json` é o template dos headers) |
 | 7 | Código morto/sensível | Remoção de branches não usados e constantes desnecessárias; admin reescrito |
 | 8 | Sem rate limiting / força bruta | **Google OAuth** gerencia credenciais; monitoração via log de auditoria do Supabase. Nota: a Data API do Supabase não permite restringir CORS no dashboard (header é `*` fixo — não há "Allowed Origins"); por isso a defesa real é 100% RLS |
 | 9 | Validação client-side como única defesa | **RLS server-side** é a defesa real; validação client = UX, não segurança |
@@ -164,8 +164,7 @@ o Auth responde `400 validation_failed — Unsupported provider: provider is not
 
 ## 8. Deploy e custos
 
-- **Deploy**: site permanece estático (Vercel ou hospedagem atual); Supabase cuida do
-  banco/auth.
+- **Deploy**: site permanece estático, com **domínio próprio** (hospedagem a definir — **sem Vercel**); Supabase cuida do banco/auth. Headers de segurança aplicados conforme o host escolhido (template em `site/vercel.json`).
 - **Custo**: plano **free do Supabase** (500 MB / cotas diárias, R$ 0 no volume deste site).
   Se houver migração futura para PostgreSQL próprio, o SQL sai **sem reescrita** (universal).
 
@@ -223,7 +222,7 @@ o Auth responde `400 validation_failed — Unsupported provider: provider is not
 | `site/back/{acervo,home,biografias,poetisa,common}.js` | ✅ criados (leitura + fallback) |
 | `site/estrutura/*.html` | ✅ páginas públicas com o novo visual |
 | `supabase/migrations/001_init.sql` | ✅ criado e **aplicado** via SQL Editor (chema + RLS + seed); seed idempotente (só popula tabela vazia) |
-| `site/vercel.json` | ✅ criado com CSP (default-src 'self' + Google Fonts + jsdelivr + Supabase connect + YouTube/Vimeo frame), `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` |
+| `site/vercel.json` | ✅ **template** de headers de segurança (CSP `default-src 'self'` + Google Fonts + jsdelivr + Supabase connect + YouTube/Vimeo frame, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`) — a **portar para o host final** (deploy não será Vercel) |
 
 ---
 
@@ -235,7 +234,7 @@ o Auth responde `400 validation_failed — Unsupported provider: provider is not
 | 1 | Migração SQL + RLS + seed (`001_init.sql`) | ✅ feito (aplicada; verificado via API) |
 | 2 | `supabase-config.js` + `acervo.js` (leitura) | ✅ feito e operando (dados reais no site) |
 | 3 | `admin.html` completo (login Google + CRUD + capas) | ✅ **feito e validado** (login via Google + allowlist operando) |
-| 4 | Segurança (CSP/Vercel, auditoria RLS) | 🔶 parcial — `vercel.json` (CSP/headers) ✅ pronto; falta **publicar no Vercel** p/ headers saírem do ar. ~~CORS do dashboard~~ removido: **a Data API do Supabase não permite restringir CORS** (sem "Allowed Origins"; header `*` fixo — docs + discussões GitHub). RLS segue como barreira real |
+| 4 | Segurança (headers de deploy, auditoria RLS) | 🔶 parcial — template de headers ✅ (`site/vercel.json`); falta **deploy de produção com domínio próprio** (hospedagem a definir — **sem Vercel**) p/ headers saírem do ar. ~~CORS do dashboard~~ removido: **a Data API do Supabase não permite restringir CORS** (sem "Allowed Origins"; header `*` fixo — docs + discussões GitHub). RLS segue como barreira real |
 | 5 | Documentação (`requisitos.md`, `memoria.md`, `backend.md`) | ✅ feito (auditoria 25/09: vuln #4, Inter, admin sem innerHTML, plano-alteracoes — todos tratados) |
 
 ---
