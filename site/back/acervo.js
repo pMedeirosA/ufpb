@@ -142,7 +142,7 @@
     var trimmed = String(url).trim();
     var match = trimmed.match(/(?:[?&]id=|file\/d\/|\/d\/)([A-Za-z0-9_-]{10,})/);
     if (match && match[1]) {
-      return 'https://drive.usercontent.google.com/download?id=' + match[1] + '&export=view';
+      return 'https://lh3.googleusercontent.com/d/' + match[1];
     }
     return trimmed;
   }
