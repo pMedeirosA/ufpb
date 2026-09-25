@@ -140,9 +140,9 @@
   function getDirectImageUrl(url) {
     if (!url) return '';
     var trimmed = String(url).trim();
-    var match = trimmed.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    var match = trimmed.match(/(?:[?&]id=|file\/d\/|\/d\/)([A-Za-z0-9_-]{10,})/);
     if (match && match[1]) {
-      return 'https://drive.google.com/uc?export=view&id=' + match[1];
+      return 'https://drive.usercontent.google.com/download?id=' + match[1] + '&export=view';
     }
     return trimmed;
   }

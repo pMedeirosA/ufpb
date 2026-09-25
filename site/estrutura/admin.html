@@ -1019,15 +1019,15 @@
 
     /**
      * Converte URL do Google Drive para link direto de imagem
-     * drive.google.com/file/d/ID/view -> drive.google.com/uc?export=view&id=ID
+     * drive.google.com/file/d/ID/view -> drive.usercontent.google.com/download?id=ID&export=view
+     * (endpoint estável: `uc?export=view` retorna 403 em navegador que envia header Origin)
      */
     function getDirectImageUrl(url) {
       if (!url) return '';
       url = url.trim();
-      const driveRegex = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
-      const match = url.match(driveRegex);
-      if (match && match[1]) {
-        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      const idMatch = url.match(/(?:[?&]id=|file\/d\/|\/d\/)([A-Za-z0-9_-]{10,})/);
+      if (idMatch && idMatch[1]) {
+        return `https://drive.usercontent.google.com/download?id=${idMatch[1]}&export=view`;
       }
       return url;
     }

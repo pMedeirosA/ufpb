@@ -49,6 +49,7 @@ Site **"Memórias da Poesia Popular"** — acervo digital das poetisas da litera
   - **Admin sem innerHTML de dados**: `renderCards` e `renderCoversList` reescritos com DOM API; `escapeHtml` (agora morto) removido. Únicos `innerHTML` restantes = ícones SVG **constantes** (edit/delete), sem dados dinâmicos.
   - **Fase 4 parcial**: `site/vercel.json` criado com `Content-Security-Policy` (self + Google Fonts + jsdelivr + Supabase connect + YouTube/Vimeo frame), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`.
   - **`plano-alteracoes-visuais.md`** atualizado: `.decor-hero-bird`/`siteWix13.png`, `styles.css` e `script.js` **não existem mais**; itens C/D já estão implementados (Inter + rodapé `--font-body`); plano segue **suspenso** (Regra 9).
+  - **Google Drive corrigido (25/09):** `drive.google.com/uc?export=view&id=...` retorna **403 quando o navegador envia `Origin`** (imagens sumiam no site). `getDirectImageUrl` (`acervo.js` + `admin.html`) agora gera `https://drive.usercontent.google.com/download?id=...&export=view` e **re-normaliza links antigos já salvos** na leitura (foto e capas). Testado: 200 `image/jpeg` com headers de navegador.
 
 ### Pendente
 - Req 06 — conteúdo da seção Comentários (painel já está montado, vazio, sem conteúdo fictício).
