@@ -34,5 +34,8 @@ Antes de qualquer execução, o agente deve primeiro elaborar e apresentar um **
 ### Regra 10 — Leitura Obrigatória da Memória
 Todo agente que iniciar uma sessão neste projeto **sem memória prévia dele** (primeira vez trabalhando no projeto, contexto resetado, memória perdida ou ausência de histórico) **DEVE ler obrigatoriamente o arquivo `memoria.md`** antes de qualquer outra atividade, e segui-lo como fonte de contexto. A leitura é condição obrigatória para começar a trabalhar; não pode ser ignorada ou postergada.
 
+### Regra 11 — Leitura dos .md a Cada Mensagem
+A cada **nova mensagem** do usuário, o agente **DEVE reconsultar os arquivos `.md` do projeto** (`AGENTS.md`, `memoria.md`, `requisitos.md`, `design.md`, `backend.md`, `site/plano-supabase.md`) antes de responder ou executar qualquer ação. A leitura garante contexto atualizado e evita decisões baseadas em informações desatualizadas. A reconsulta pode ser seletiva (apenas os `.md` relevantes à mensagem), mas deve ocorrer sempre que a sessão estiver em andamento e o contexto puder ter mudado desde a última leitura.
+
 ## Diretrizes do Projeto
 - _Em construção_
