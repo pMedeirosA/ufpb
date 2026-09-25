@@ -278,6 +278,25 @@
       stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
     }
 
+    .btn-manual {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: none;
+      border: 2px solid var(--gold);
+      color: var(--brown);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-manual:hover { background: var(--gold); color: var(--brown); }
+    .btn-manual svg {
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
     /* Indicador de carregamento global */
     .loading-bar {
       position: fixed; top: 0; left: 0; right: 0;
@@ -720,6 +739,89 @@
     .btn-confirm-delete:hover { background: var(--danger-dark); }
     .btn-confirm-delete:disabled { opacity: 0.6; cursor: not-allowed; }
 
+    /* ========== MANUAL DO PAINEL ========== */
+    .manual-overlay {
+      position: fixed; inset: 0;
+      background: rgba(44,24,16,0.55);
+      z-index: 350;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    .manual-overlay.active { opacity: 1; visibility: visible; }
+
+    .manual-modal {
+      background: var(--beige);
+      border-radius: 14px;
+      width: 100%; max-width: 720px;
+      max-height: 85vh;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(44,24,16,0.35);
+    }
+    .manual-header {
+      padding: 20px 28px;
+      background: var(--brown-medium);
+      color: var(--beige);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .manual-header h3 { font-size: 1.1rem; color: var(--gold); }
+    .manual-close {
+      width: 36px; height: 36px;
+      border: none; border-radius: 8px;
+      background: rgba(245,237,227,0.12);
+      color: var(--beige);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: background 0.2s;
+    }
+    .manual-close:hover { background: rgba(245,237,227,0.22); }
+
+    .manual-body {
+      flex: 1; overflow-y: auto;
+      padding: 28px;
+    }
+    .manual-section { margin-bottom: 26px; }
+    .manual-section:last-child { margin-bottom: 0; }
+    .manual-section h4 {
+      font-size: 0.95rem;
+      color: var(--terracotta);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--gold);
+    }
+    .manual-section ol { padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+    .manual-section li { font-size: 0.88rem; color: var(--brown); line-height: 1.6; }
+    .manual-note {
+      background: rgba(212,168,83,0.18);
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: var(--brown-light);
+      margin-top: 12px;
+    }
+    .manual-tip {
+      background: rgba(196,81,61,0.08);
+      border-left: 4px solid var(--terracotta);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: var(--brown-light);
+      margin-top: 12px;
+    }
+    .manual-kbd {
+      font-family: inherit;
+      background: var(--white);
+      border: 1px solid #e0d5c8;
+      border-radius: 5px;
+      padding: 1px 7px;
+      font-size: 0.8rem;
+      color: var(--brown);
+    }
+
     /* ========== TOAST (NOTIFICAÇÕES) ========== */
     .toast {
       position: fixed;
@@ -828,6 +930,10 @@
         </div>
         <div class="header-meta">
           <span class="header-count" id="headerCount">0 poetisas</span>
+          <button class="btn-manual" id="btnManual" type="button">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            Manual
+          </button>
           <button class="btn-logout" id="btnLogout">Sair</button>
         </div>
       </header>
@@ -963,6 +1069,64 @@
       <div class="confirm-actions">
         <button class="btn-confirm-cancel" id="btnConfirmCancel">Cancelar</button>
         <button class="btn-confirm-delete" id="btnConfirmDelete">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MANUAL DO PAINEL ========== -->
+  <div class="manual-overlay" id="manualOverlay">
+    <div class="manual-modal" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
+      <div class="manual-header">
+        <h3 id="manualTitle">Manual do Painel</h3>
+        <button class="manual-close" id="manualClose" aria-label="Fechar manual">✕</button>
+      </div>
+      <div class="manual-body">
+        <div class="manual-section">
+          <h4>1. Acesso</h4>
+          <ol>
+            <li>Abra o painel pelo link <strong>Administração</strong> no rodapé do site (ou pelo endereço direto da página do painel).</li>
+            <li>Clique em <strong>Entrar com Google</strong> usando um e-mail <strong>autorizado pela chefia</strong>.</li>
+            <li>Somente e-mails na lista de permissão conseguem entrar; os demais recebem "Acesso negado".</li>
+          </ol>
+        </div>
+        <div class="manual-section">
+          <h4>2. Adicionar uma poetisa</h4>
+          <ol>
+            <li>Clique em <strong>Nova Poetisa</strong>.</li>
+            <li>Preencha o <strong>Nome</strong> (obrigatório). As <strong>Iniciais</strong> são geradas automaticamente e podem ser ajustadas.</li>
+            <li>Opcional: <strong>Subtítulo</strong> (ex.: "Poetisa e educadora"), <strong>Resumo</strong> (frase de apresentação no cartão) e <strong>Biografia</strong> (use linha em branco para separar parágrafos).</li>
+            <li>Clique em <strong>Salvar</strong>.</li>
+          </ol>
+        </div>
+        <div class="manual-section">
+          <h4>3. Foto de perfil</h4>
+          <ol>
+            <li>Aba <strong>URL da Imagem</strong>: cole o link direto da foto (Google Drive, Imgur etc.) e a prévia aparece na hora.</li>
+            <li>Aba <strong>Nenhuma</strong>: o site usa um monograma com as iniciais da poetisa.</li>
+          </ol>
+          <div class="manual-note"><strong>Google Drive:</strong> o arquivo precisa estar <strong>"compartilhado com qualquer pessoa que tiver o link"</strong>, senão a foto não carrega no site.</div>
+        </div>
+        <div class="manual-section">
+          <h4>4. Vídeo (opcional)</h4>
+          <ol>
+            <li>Cole um link de <strong>YouTube ou Vimeo</strong>. Ele aparece na página da poetisa, logo depois das obras.</li>
+          </ol>
+        </div>
+        <div class="manual-section">
+          <h4>5. Capas de obras</h4>
+          <ol>
+            <li>Em "Capas e folhetos", informe a <strong>URL da imagem</strong> e o <strong>título</strong>, e clique em <strong>Adicionar capa</strong>.</li>
+            <li>Repita para cada obra. Use <strong>Remover</strong> para tirar uma capa da lista antes de salvar.</li>
+          </ol>
+        </div>
+        <div class="manual-section">
+          <h4>6. Editar e excluir</h4>
+          <ol>
+            <li><strong>Editar</strong>: clique no ícone da caneta no cartão, ajuste os campos e clique em <strong>Salvar</strong>.</li>
+            <li><strong>Excluir</strong>: clique no ícone da lixeira e confirme. A ação não pode ser desfeita.</li>
+          </ol>
+          <div class="manual-tip">O site público atualiza <strong>imediatamente</strong> após salvar. Se algo parecer desatualizado, dê <span class="manual-kbd">Ctrl + F5</span> no navegador.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1624,6 +1788,21 @@
     }
 
     /* ============================================================
+       MANUAL DO PAINEL
+    ============================================================ */
+    function openManual() {
+      document.getElementById('manualOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeManual() {
+      document.getElementById('manualOverlay').classList.remove('active');
+      const confirmActive = document.getElementById('confirmOverlay').classList.contains('active');
+      const panelActive = document.getElementById('panel').classList.contains('active');
+      if (!confirmActive && !panelActive) document.body.style.overflow = '';
+    }
+
+    /* ============================================================
        SIDEBAR MOBILE
     ============================================================ */
     function toggleSidebar() {
@@ -1723,6 +1902,12 @@
         if (e.target === this) closeConfirm();
       });
 
+      document.getElementById('btnManual').addEventListener('click', openManual);
+      document.getElementById('manualClose').addEventListener('click', closeManual);
+      document.getElementById('manualOverlay').addEventListener('click', function (e) {
+        if (e.target === this) closeManual();
+      });
+
       document.getElementById('btnLogout').addEventListener('click', async function () {
         await supabase.auth.signOut();
         location.reload();
@@ -1733,7 +1918,10 @@
 
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
-          if (document.getElementById('confirmOverlay').classList.contains('active')) {
+          if (document.getElementById('manualOverlay').classList.contains('active')) {
+            closeManual();
+
+          } else if (document.getElementById('confirmOverlay').classList.contains('active')) {
             closeConfirm();
           } else if (document.getElementById('panel').classList.contains('active')) {
             closePanel();
