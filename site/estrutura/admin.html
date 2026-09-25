@@ -739,6 +739,30 @@
     .btn-confirm-delete:hover { background: var(--danger-dark); }
     .btn-confirm-delete:disabled { opacity: 0.6; cursor: not-allowed; }
 
+    .confirm-name {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .confirm-name label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--brown-light);
+      margin-bottom: 6px;
+    }
+    .confirm-name input {
+      width: 100%;
+      padding: 11px 13px;
+      border: 2px solid #e0d5c8;
+      border-radius: 8px;
+      background: var(--beige);
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--brown);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .confirm-name input:focus { border-color: var(--terracotta); }
+
     /* ========== MANUAL DO PAINEL ========== */
     .manual-overlay {
       position: fixed; inset: 0;
@@ -1066,9 +1090,13 @@
       </div>
       <h4>Excluir Poetisa</h4>
       <p id="confirmMessage">Tem certeza que deseja excluir esta poetisa? Esta ação não pode ser desfeita.</p>
+      <div class="confirm-name">
+        <label for="confirmNameInput">Digite o nome da poetisa para confirmar:</label>
+        <input type="text" id="confirmNameInput" autocomplete="off" placeholder="Nome da poetisa">
+      </div>
       <div class="confirm-actions">
         <button class="btn-confirm-cancel" id="btnConfirmCancel">Cancelar</button>
-        <button class="btn-confirm-delete" id="btnConfirmDelete">Excluir</button>
+        <button class="btn-confirm-delete" id="btnConfirmDelete" disabled>Excluir</button>
       </div>
     </div>
   </div>
@@ -1115,7 +1143,7 @@
           <h4>Editar e excluir</h4>
           <ol>
             <li><strong>Editar</strong>: clique no ícone da caneta no cartão, ajuste os campos e clique em <strong>Salvar</strong>.</li>
-            <li><strong>Excluir</strong>: clique no ícone da lixeira e confirme. A ação não pode ser desfeita.</li>
+            <li><strong>Excluir</strong>: clique no ícone da lixeira e, para confirmar, <strong>digite o nome exato da poetisa</strong> no campo. A ação só é liberada com o nome correto e não pode ser desfeita.</li>
           </ol>
           <div class="manual-tip">O site público atualiza <strong>imediatamente</strong> após salvar. Se algo parecer desatualizado, dê <span class="manual-kbd">Ctrl + F5</span> no navegador.</div>
         </div>
@@ -1145,6 +1173,7 @@
     let poetisas = [];          // Lista local sincronizada com o Supabase
     let covers = [];            // Capas e folhetos do formulário
     let deleteTargetId = null;  // ID do registro a ser excluído
+    let deleteTargetName = '';  // Nome exigido para confirmar a exclusão
     let currentPhotoType = 'url'; // Tipo de foto selecionado na aba
     let currentUserEmail = null; // E-mail autenticado
     let isSaving = false;       // Flag para evitar duplo submit
@@ -1743,13 +1772,32 @@
       const p = poetisas.find(x => x.id === id);
       if (!p) return;
       deleteTargetId = id;
+      deleteTargetName = p.name;
       document.getElementById('confirmMessage').textContent =
         `Tem certeza que deseja excluir "${p.name}"? Esta ação não pode ser desfeita.`;
+      const nameInput = document.getElementById('confirmNameInput');
+      nameInput.value = '';
+      nameInput.placeholder = `Digite "${p.name}"`;
+      const btnDelete = document.getElementById('btnConfirmDelete');
+      btnDelete.disabled = true;
+      btnDelete.textContent = 'Excluir';
       document.getElementById('confirmOverlay').classList.add('active');
+      setTimeout(() => nameInput.focus(), 0);
+    }
+
+    function updateConfirmDeleteState() {
+      const typed = document.getElementById('confirmNameInput').value.trim();
+      const matches = typed !== '' && typed === deleteTargetName;
+      document.getElementById('btnConfirmDelete').disabled = !matches;
     }
 
     async function executeDelete() {
       if (!deleteTargetId) return;
+      const typed = document.getElementById('confirmNameInput').value.trim();
+      if (typed !== deleteTargetName) {
+        showToast('O nome digitado não confere. Exclusão cancelada.', 'error');
+        return;
+      }
 
       const btnDelete = document.getElementById('btnConfirmDelete');
       btnDelete.disabled = true;
@@ -1776,6 +1824,10 @@
 
     function closeConfirm() {
       deleteTargetId = null;
+      deleteTargetName = '';
+      const nameInput = document.getElementById('confirmNameInput');
+      if (nameInput) nameInput.value = '';
+      document.getElementById('btnConfirmDelete').disabled = true;
       document.getElementById('confirmOverlay').classList.remove('active');
     }
 
@@ -1890,6 +1942,7 @@
 
       document.getElementById('btnConfirmDelete').addEventListener('click', executeDelete);
       document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirm);
+      document.getElementById('confirmNameInput').addEventListener('input', updateConfirmDeleteState);
       document.getElementById('confirmOverlay').addEventListener('click', function (e) {
         if (e.target === this) closeConfirm();
       });
