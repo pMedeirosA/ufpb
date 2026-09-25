@@ -50,6 +50,7 @@ Site **"Memórias da Poesia Popular"** — acervo digital das poetisas da litera
   - **Fase 4 parcial**: `site/vercel.json` criado com `Content-Security-Policy` (self + Google Fonts + jsdelivr + Supabase connect + YouTube/Vimeo frame), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`.
   - **`plano-alteracoes-visuais.md`** atualizado: `.decor-hero-bird`/`siteWix13.png`, `styles.css` e `script.js` **não existem mais**; itens C/D já estão implementados (Inter + rodapé `--font-body`); plano segue **suspenso** (Regra 9).
   - **Google Drive corrigido (25/09):** hotlink do Drive exige cuidado — `drive.usercontent.google.com/download` e `uc?export=view` respondem **403 para User-Agent de navegador real** (anti-hotlink). `getDirectImageUrl` (`acervo.js` + `admin.html`) agora gera `https://lh3.googleusercontent.com/d/<ID>` (responder 200 image/jpeg com UA/Origin/Referer de navegador; testado) e **re-normaliza links antigos já salvos** na leitura (foto e capas).
+  - **Bug admin — form lembrado ao editar (25/09):** `loadPoetisas` usava as linhas cruas do Supabase (snake_case `photo_type`/`photo_url`), mas o resto do admin lia camelCase (`photoType`/`photoUrl`) → toda edição abria como "Nenhuma" e perdia foto/vídeo/capas (e cards nunca mostravam imagem). Corrigido com **mapeamento `snake_case → camelCase`** em `loadPoetisas`.
 
 ### Pendente
 - Req 06 — conteúdo da seção Comentários (painel já está montado, vazio, sem conteúdo fictício).
