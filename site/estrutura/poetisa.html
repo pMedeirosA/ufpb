@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Perfil, biografia, obras e capas de folhetos de uma poetisa da literatura de cordel.">
+  <meta name="theme-color" content="#7a263a">
+  <title>Poetisa — Memórias da Poesia Popular</title>
+  <link rel="icon" href="../elementos/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../visual/public.css">
+</head>
+<body data-page="poetisa">
+  <a class="skip-link" href="#conteudo-principal">Ir para o conteúdo</a>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="index.html" aria-label="Memórias da Poesia Popular — página inicial">
+        <span class="brand__title">Memórias</span>
+        <span class="brand__descriptor">da Poesia Popular</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation" aria-label="Abrir menu">
+        <span class="menu-toggle__lines" aria-hidden="true"></span>
+      </button>
+      <nav class="site-nav" id="site-navigation" aria-label="Navegação principal" data-open="false">
+        <a class="site-nav__link" href="index.html">Início</a>
+        <a class="site-nav__link" href="sobre.html">Sobre</a>
+        <a class="site-nav__link" href="biografias.html" aria-current="page">Poetisas</a>
+        <a class="site-nav__link" href="contato.html">Contato</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="config-banner" data-config-banner role="status" hidden>
+    O acervo está em preparação. Novos registros serão publicados em breve.
+  </div>
+  <noscript>
+    <div class="config-banner">Ative o JavaScript para consultar o acervo digital.</div>
+  </noscript>
+
+  <main id="conteudo-principal">
+    <section class="section" aria-labelledby="nome-poetisa">
+      <div class="shell profile-header" data-profile-header aria-live="polite">
+        <div class="state-panel">
+          <div class="state-panel__inner">
+            <p data-profile-loader>Carregando o perfil.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--deep works-section" data-works-section aria-labelledby="titulo-obras" hidden>
+      <div class="shell">
+        <div class="works-heading">
+          <div>
+            <span class="eyebrow">Acervo</span>
+            <h2 id="titulo-obras">Obras e folhetos</h2>
+          </div>
+          <p data-works-count></p>
+        </div>
+        <div class="works-gallery" data-works-gallery></div>
+      </div>
+    </section>
+  </main>
+
+  <section class="supporters" aria-labelledby="titulo-apoiadores">
+    <div class="shell supporters__inner">
+      <h2 id="titulo-apoiadores">Apoio e realização</h2>
+      <div class="supporters__grid">
+        <div class="supporter"><img src="../logos/CNPq.png" alt="CNPq" width="720" height="222" loading="lazy" decoding="async"></div>
+        <div class="supporter"><img src="../logos/DCI.png" alt="DCI" width="720" height="371" loading="lazy" decoding="async"></div>
+        <div class="supporter"><img src="../logos/PPGCI.png" alt="PPGCI" width="720" height="368" loading="lazy" decoding="async"></div>
+        <div class="supporter"><img src="../logos/ACVPB.png" alt="ACVPB" width="360" height="540" loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <strong>Memórias da Poesia Popular</strong>
+            <span>Acervo digital de poetisas da literatura de cordel</span>
+          </div>
+          <nav class="footer-nav" aria-label="Navegação do rodapé">
+            <a href="index.html">Início</a>
+            <a href="sobre.html">Sobre</a>
+            <a href="biografias.html">Poetisas</a>
+            <a href="contato.html">Contato</a>
+          </nav>
+        </div>
+        <div>
+          <p>Um site aberto para conhecer biografias, obras e capas de folhetos vinculados às poetisas.</p>
+          <a class="text-link" href="admin.html">Acesso administrativo</a>
+        </div>
+      </div>
+      <section class="credits" aria-labelledby="titulo-creditos">
+        <h2 id="titulo-creditos">Créditos</h2>
+        <div class="credits__group">
+          <a class="credit-pill" href="https://portsamuellmsa.vercel.app/" target="_blank" rel="noopener noreferrer">Samuel Lucas</a>
+          <a class="credit-pill" href="https://miguelfernandes3d2-netizen.github.io/portifolio.green/" target="_blank" rel="noopener noreferrer">Miguel Fernandes</a>
+          <span class="credit-pill credit-pill--illustrator">Jackson — Ilustrador</span>
+        </div>
+      </section>
+      <div class="footer-bottom">
+        <span>© <span data-current-year>2026</span> Memórias da Poesia Popular.</span>
+        <span>Projeto acadêmico da UFPB</span>
+      </div>
+    </div>
+  </footer>
+
+  <dialog class="lightbox" data-lightbox aria-label="Capa ampliada">
+    <div class="lightbox__bar">
+      <p data-lightbox-title></p>
+      <button class="lightbox__close" type="button" data-lightbox-close aria-label="Fechar imagem">Fechar</button>
+    </div>
+    <img data-lightbox-image alt="">
+  </dialog>
+
+  <script src="../back/supabase-config.js"></script>
+  <script src="../back/acervo.js"></script>
+  <script src="../back/common.js"></script>
+  <script src="../back/poetisa.js"></script>
+</body>
+</html>

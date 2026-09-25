@@ -1,120 +1,98 @@
 # Design do Projeto
 
-> Baseado no design system real do site de referência (modelo `siterasc.vercel.app`), extraído do `styles.css`.
+> Design system do site **"Memórias da Poesia Popular"** (aprovado pelo usuário). Fonte canônica: `site/visual/public.css` (copiado do build `Downloads/ufpb-main-modificado/ufpb-main` e com o `@font-face` ajustado para o caminho local `../fonts/JacksonXilogravura-Regular.otf`). Este arquivo substitui o design antigo do site.
 
 ## Visão Geral
-Identidade visual "Cordel Terroso": estética de literatura de cordel brasileira com xilogravuras decorativas, paleta terrosa (bege, terracota, dourado) e tipografia serifada de caráter popular. Estilo glassmorphism nos cards, animações sutis de scroll e layout responsivo. O site é aberto para todos, simples e fácil de navegar (sem classes temáticas).
+Identidade visual "Memória em Matriz": estética memorial de cordel com papel envelhecido, vinho, dourado e sálvia; tipografia display em xilogravura (Jackson Xilogravura) e corpo neutro. Layout editorial, tipográfico e limpo, sem ornamentos decorativos por página; a "matriz" (xilogravura) e o "fio de memória" são os únicos elementos gráficos. O site é aberto, simples e acessível (skip-link, navegação clara, `aria-current`).
 
 ## Identidade Visual
 
-### Paleta de Cores (variáveis CSS em `:root`)
+### Paleta de Cores (variáveis CSS em `:root` de `public.css`)
 | Variável | Valor | Uso |
 |---|---|---|
-| `--color-bg` | `#F5EDE3` | Fundo principal (bege creme) |
-| `--color-bg-warm` | `#F0E4D5` | Fundo quente (gradientes) |
-| `--color-bg-alt` | `#EDE0D0` | Fundo alternativo |
-| `--color-surface` | `#FDFAF6` | Superfície (cards/modal) |
-| `--color-surface-warm` | `#F8F0E6` | Superfície quente |
-| `--color-primary` | `#C4513D` | Terracota — ação/CTA |
-| `--color-primary-dark` | `#A33C2B` | Terracota escuro (hover) |
-| `--color-primary-light` | `#E07A68` | Terracota claro |
-| `--color-secondary` | `#D4A853` | Dourado — destaque |
-| `--color-secondary-light` | `#E8C778` | Dourado claro (texto em fundo escuro) |
-| `--color-accent` | `#8B5E3C` | Marrom — detalhes |
-| `--color-text` | `#1E110A` | Texto (marrom escuro) / fundo do carrossel/footer |
-| `--color-text-muted` | `#3E2A1E` | Texto secundário |
-| `--color-text-light` | `#6B5545` | Texto terciário |
+| `--paper` | `#f4f0e8` | Fundo principal (papel) |
+| `--paper-deep` | `#ece5d8` | Fundo alternativo (seções "deep") |
+| `--ink` | `#211a18` | Texto principal / fundos escuros |
+| `--ink-soft` | `#5b544c` | Texto secundário |
+| `--wine` | `#7a263a` | Vinho — acentos, títulos, bordas, CTA |
+| `--brass` | `#c29a4a` | Dourado — detalhes e realces |
+| `--sage` | `#53665a` | Sálvia — detalhes secundários |
+| `--line` | `rgba(33, 26, 24, 0.12)` | Bordas fracas |
+| `--line-strong` | `rgba(33, 26, 24, 0.25)` | Bordas fortes |
 
-Bordas: `rgba(139, 94, 60, 0.15)` (fraca) e `rgba(139, 94, 60, 0.3)` (forte).
-Glassmorphism: fundo `rgba(253,250,246,0.7)` + blur `16px` + borda branca `0.25`; variante escura `rgba(44,24,16,0.75)`.
+`--header-height` controla o cabeçalho fixo; sombras `--shadow-sm/md` e raios `12px` padronizam cards e imagens.
 
 ### Tipografia
-- **Display** (`--font-display`): **JacksonXilogravura** (fonte local `fonts/JacksonXilogravura-Regular.otf`, criada por Jackson) → fallback Playfair Display, serif. Usada em títulos, navbar, botões e destaque.
-- **Heading** (`--font-heading`): Playfair Display (Google Fonts).
-- **Body** (`--font-body`): Inter (Google Fonts, pesos 300–700).
-- Escala: `--text-xs` 0.85rem → `--text-6xl` 4.5rem. H1 = 3.5rem/700, H2 = 2.6rem/600, H3 = 1.6rem, H4 = 1.35rem.
+- **Display** (`--font-display`): **Jackson Xilogravura** (fonte local `fonts/JacksonXilogravura-Regular.otf`, criada por Jackson) → fallback serif. Títulos em caixa alta discreta, peso 400, `line-height` ~0.94–1.
+- **Corpo** (`--font-body`): **Inter** (Google Fonts). Subtítulos/lede em peso leve, cor `--ink-soft`.
+- Escala fluida com `clamp()`: H1 hero ~`5.5rem`, H1 perfil até `6.5rem`, títulos de seção ~`4rem`, texto ~`1.08rem`.
 
 ### Logotipo
-- Não há arquivo de logo; a marca é o texto **"Memórias das Poetisas da Literatura de Cordel"** na fonte display.
-
-### Elementos Decorativos (xilogravura)
-Imagens PNG 32-bit em `elementos/` (nomeclatura herdada do editor Wix): `siteWix.png` (separador), `siteWix2.png`–`siteWix15.png` e variantes brancas `siteWix3_branco.png`/`siteWix11_branco.png`. Posicionadas de forma absoluta com `clamp()` para largura e `vw` para posição; **opacidade 25% abaixo de 1440px e ocultas no mobile (<768px)**.
+- Marca textual no cabeçalho: **"Memórias"** (`brand__title`) sobre **"da Poesia Popular"** (`brand__descriptor`) na fonte display.
+- Ícone: `elementos/favicon.svg`.
 
 ## Sessões e Layout
 
-### Navbar (fixa, glassmorphism)
-- Fixa no topo; transparente no início → ao rolar (`>40px`) ganha fundo translúcido `rgba(252,245,236,0.6)` + blur 12px.
-- Brand à esquerda, links (Início, Sobre, Biografias, Contato) à direita.
-- Link ativo: terracota com barra de 20px abaixo.
-- Mobile: hambúrguer (anima para ✕) abre gaveta lateral 280px fundo `--color-surface`.
+### Cabeçalho (site-header)
+- Fixo, com `site-header__inner` centralizado. Brand à esquerda, navegação à direita: **Início, Sobre, Poetisas, Contato**.
+- Link ativo com `aria-current="page"` (estilo vinho sublinhado).
+- Mobile (< 64.1rem): botão `.menu-toggle` (aria-expanded) abre/fecha a gaveta `[data-open]` (gerido por `back/common.js`); fechamento ao clicar em link ou `Esc`, e ao voltar para desktop.
 
 ### Hero (página inicial)
-- 100vh, gradiente `135deg` (bege → `#F2D9CF` → bege-warm).
-- Subtítulo terracota + título com gradiente de texto + descrição + 2 CTAs.
-- Animação `fadeInUp` em cascata (0s/0.2s/0.4s/0.6s). 3 elementos decorativos (pássaro no título, lado esquerdo/direito).
+- Bloco `home-hero` com copy à esquerda: eyebrow, H1 **"A memória das poetisas de cordel."** (com destaque vinho), lede, 2 CTAs (`.button` vinho e `.button--secondary`) e 3 pilares (Biografias, Obras, Capas).
+- À direita: `matrix-art` com `elementos/matriz-memoria.svg` e selo "Memória em matriz".
 
-### Carrossel "Vozes do Cordel"
-- Fundo escuro (`--color-text`), título dourado claro, 3 poemas em itálico.
-- Autoplay 6s, setas circulares `‹`/`›`, dots (ativo expande para 24px).
-- ⚠️ **Planejado: substituir por seção de Comentários** (ver `requisitos.md`).
+### Seções
+- `project-intro` (Início): número de índice (01), eyebrow, H2 display e lede + `text-link`.
+- `section-heading`: eyebrow + H2 à esquerda, texto/link à direita.
+- `section--deep`: fundo `--paper-deep` com borda superior.
+- `page-hero` (páginas internas): eyebrow + H1 + leitura descritiva à direita.
+- `reading-width` + `prose`: texto institucional com largura de leitura; `principles-list` para princípios e equipe (strong + texto).
+- `folio-rule`: `elementos/fio-memoria.svg` usado como divisor decorativo.
 
-### Cards
-- Glass (fundo translúcido + blur), raio 20px; hover: `translateY(-4px)` + sombra maior.
+### Destaques e catálogo
+- Início: `.feature-grid` 3 cards (`data-featured-poetisas`, geridos por `back/home.js`).
+- Biografias: `.catalog-tools` com `.search-field` (busca por nome) e `.letter-filter` (Todos + A–Z, gerido por `back/biografias.js`); `.catalog-status` (resultado + total); `.poetisa-grid`; `.load-more` (Carregar mais / página de 24). Filtro e busca sincronizam a URL (`letra`, `busca`).
+- Cards (`poetisa-card`): retrato 4:5 com foto ou placeholder de iniciais (`poetisa-card__fallback` — fundo vinho com iniciais display), nome, resumo e "Ver perfil". Usados no destaque e no catálogo.
+- Esqueletos de carregamento (`.skeleton-card`) e estado vazio (`.state-panel`).
 
-### Seção Sobre (página inicial)
-- Card central (máx. 800px), texto justificado, CTA "Saiba Mais". Fundo com 2 imagens decorativas.
+### Página da poetisa (`poetisa.html?slug=...`)
+- `.profile-header` (2 colunas): `.profile-portrait` fixo (frame 4:5, foto ou `profile-portrait__fallback` com iniciais) + `.profile-copy` (H1, `.lede`, `.biography` com drop cap na 1ª letra).
+- Seção `.works-section`: `.works-heading` (eyebrow "Acervo" + H2 **"Obras e folhetos"** + contador) e `.works-gallery` (4 colunas).
+- `.work-card`: figure com botão de ampliação, imagem 4:5 e legenda (tipo de obra). Clique abre `.lightbox` (**dialog**) com barra de título + fechar + imagem; fecha por botão, `Esc` ou clique no backdrop.
+- Vídeo opcional (youtube/vimeo) renderizado após as obras com iframe 16:9.
 
-### Apoio e Realização (parceiros)
-- Título H3 terracota, grid de logos (CNPq, ACVPB, DCI, PPGCI) centralizados (máx. 1000px).
-- Hover: leve zoom. Logo máx. 200px/80px altura; mobile: 140px/60px.
-- ⚠️ **Pendência:** ordem do apoio — ACVPB (segunda) deve ir para a direita (ver `requisitos.md`).
+### Comentários
+- `.comments-panel`: painel preparado, **sem conteúdo fictício** (texto explica que o espaço aguarda a política de participação — Req 06).
 
-### Página Sobre
-- Page-hero (padding topo 80px+6rem, gradiente, título com fadeInUp).
-- Texto da pesquisa: 6 parágrafos justificados com recuo (`text-indent: 2em`).
-- Equipe: grid auto-fill 280px, foto 160x200 (borda dourada, canto 10/28px), nome, papel, ícones sociais.
+### Contato
+- `.contact-layout` 2 colunas: à esquerda eyebrow + H2 "Informação verificável." + `.contact-note` (canal institucional em validação; vínculo UFPB — João Pessoa; PPGCi).
+- À direita `.form-card` com formulário **desabilitado** (`hidden`) e painel `.state-panel` de indisponibilidade até a UFPB confirmar o canal oficial.
 
-### Página Biografias
-- Filtro de letras A–Z (sticky abaixo da navbar, ativo = terracota, indisponível = apagado).
-- Divisor de letra: inicial grande terracota + gradiente de linha.
-- Cards de biografia (2 colunas): foto 180x230 (raio assimétrico 12/32px, borda dourada 3px) ou placeholder com iniciais em gradiente; nome, resumo (máx. 4 linhas), botão "Saiba Mais" (pill com seta →).
-- **Modal de biografia**: overlay com blur + barra lateral gradiente terracota→dourado; cabeçalho com foto 120x150, nome em gradiente de texto, subtítulo; corpo com drop cap + parágrafos + vídeo 16:9 opcional.
-  - **Capas e Folhetos** (seção no modal, exibida quando houver capas): título display terracota com divisor superior; galeria `.covers-grid` (auto-fill, min 140px) com figurinhas 3:4, raio assimétrico 8/16px, borda dourada 2px, hover sobe 3px. Dados vindos de `data-covers` (JSON em `data-src`/`data-title`, escapados e validados por `http`).
+### Apoio e realização
+- `.supporters`: H2 "Apoio e realização" + `.supporters__grid` com 4 logos na **ordem correta: CNPq, DCI, PPGCI, ACVPB** (dimensões: 720x222, 720x371, 720x368, 360x540).
 
-### Página Contato
-- Grid 2 colunas: infos (ícone em círculo + texto) e card de formulário glass (Nome+Sobrenome, Email, Mensagem).
-- Inputs: fundo branco 60%, borda raio 12px; foco → borda terracota + anel `rgba(196,81,61,0.1)`.
+### Rodapé (site-footer)
+- `.footer-grid`: brand + navegação + texto + link administrativo (`admin.html`).
+- `.credits`: `credit-pill`s — **Samuel Lucas** (link `portsamuellmsa.vercel.app`), **Miguel Fernandes** (link), **Jackson — Ilustrador**.
+- `.footer-bottom`: © ano (auto via `[data-current-year]`) + "Projeto acadêmico da UFPB".
 
-### Footer
-- Fundo escuro, barra superior de 3px em gradiente terracota→dourado.
-- Brand, navegação, divisor, copyright e crédito do desenvolvedor (pill).
-- ⚠️ **Pendência:** adicionar Jackson nos créditos como **ilustrador** (ver `requisitos.md`).
-
-### Botões
-- `btn-primary`: gradiente terracota, texto branco, sombra; hover sobe 2px.
-- `btn-outline`: borda terracota 2px; hover preenche terracota.
-- `btn-glass` e `btn-sm` (compacto).
-
-### Animações
-- Tipos: `reveal`, `reveal-left`, `reveal-right`, `reveal-scale`, `stagger-children` (atrasos 80ms em cascata) — via IntersectionObserver (threshold 0.15).
-- Keyframes: `fadeInUp`, `fadeIn`, `slideUp`, `float`, `pulse-glow`.
+### Banner e acessibilidade
+- `.config-banner` (role status, `hidden` por padrão): exibido apenas quando o banco devolve zero registros; também com fallback `<noscript>`.
+- `.skip-link` "Ir para o conteúdo" em todas as páginas.
 
 ## Painel Admin (admin.html)
-- Login Google OAuth. **Design**: fundo bege, sidebar escura `#2C1810` (marca dourada, link ativo terracota), header branco com borda inferior dourada, cards brancos (hover borda dourada).
-- Formulário deslizante lateral (520px) com Nome, Iniciais (auto-geradas), Subtítulo, Resumo, Biografia, Foto (abas URL/Nenhuma) e Vídeo; toast de notificação; diálogo de confirmação de exclusão.
+- **Reescrito para Supabase** conforme `plano-supabase.md`: Auth Google (allowlist `admin_emails`), CRUD e campo de capas. Usa CSS/styles próprios do painel (não usa `public.css`).
 
 ## Responsividade
-- **1440px↓**: decorativos viram marca-d'água (opacidade 0.25).
-- **1024px↓**: títulos e cards de biografia encolhem; contato vira 1 coluna.
-- **768px↓**: menu gaveta, grids em 1 coluna, modal empilhado, decorativos ocultos.
-- **480px↓**: títulos menores.
+- Quebra principal em **64.1rem** (menu vira gaveta mobile). Grades de cards (feature/catálogo/works) colapsam para 1–2 colunas em telas menores (media queries no final de `public.css`).
 
 ## Fluxos de Navegação
-1. **Início** → CTA "Conhecer Poetisas" → Biografias; "Sobre o Projeto" → Sobre.
-2. **Biografias** → filtro A–Z ou scroll → clique no card → modal com biografia completa (+ capas/folhetos futuros).
-3. **Contato** → formulário (envio a definir com backend).
-4. **Admin** (`admin.html`) → login Google → CRUD de poetisas.
+1. **Início** → CTA "Conhecer poetisas" → Biografias; "Sobre o projeto" → Sobre; destaques → perfil da poetisa.
+2. **Biografias** → busca + filtro A–Z → card → **poetisa.html?slug** com obras e lightbox.
+3. **Contato** → formulário desabilitado (aguardando canal oficial).
+4. **Admin** (`admin.html`) → login Google (allowlist) → CRUD de poetisas e capas.
 
 ## Protótipos
-- `index.html`, `sobre.html`, `biografias.html`, `contato.html` e `admin.html` (cópia do modelo de referência) — base visual para o projeto.
-- Paleta completa e componentes documentados nas seções acima (fonte canônica: `styles.css`).
+- Páginas de referência do build novo: `Downloads/ufpb-main-modificado/ufpb-main/{index,sobre,biografias,contato,poetisa}/index.html` + `src/partials/html.js` + `src/styles/public.css`.
+- Páginas transplantadas (estáticas, sem build): `site/estrutura/*.html` usando `../visual/public.css`, `../elementos/*.svg`, `../logos/*.png` e `../back/*.js`.

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 720" role="img" aria-labelledby="title desc">
+  <title id="title">Matriz da memória</title>
+  <desc id="desc">Forma abstrata original que associa folhas, fios e blocos impressos.</desc>
+  <rect width="720" height="720" rx="48" fill="#7a263a"/>
+  <g fill="none" stroke="#f4f0e8" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M154 190c92-58 174-44 206 24v346c-44-62-126-70-206-18z"/>
+    <path d="M566 190c-92-58-174-44-206 24v346c44-62 126-70 206-18z"/>
+    <path d="M360 214v346"/>
+    <path d="M192 250c62-26 112-20 132 18M192 322c62-26 112-20 132 18M192 394c62-26 112-20 132 18M528 250c-62-26-112-20-132 18M528 322c-62-26-112-20-132 18M528 394c-62-26-112-20-132 18" opacity=".6"/>
+  </g>
+  <path d="M360 72l25 52 56 8-41 40 10 56-50-27-50 27 10-56-41-40 56-8z" fill="#d6b46a"/>
+  <path d="M92 596l24 50 53 8-39 37 10 53-48-26-47 26 9-53-38-37 53-8zM628 596l24 50 53 8-39 37 10 53-48-26-47 26 9-53-38-37 53-8z" fill="#f4f0e8" opacity=".9"/>
+</svg>

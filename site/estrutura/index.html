@@ -1,237 +1,166 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- Meta Tags & SEO                                        -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Memórias das Poetisas da Literatura de Cordel — Mapeamento da poesia feminina na literatura de cordel brasileira. Vidas, obras e temas das poetisas do cordel.">
-  <meta name="keywords" content="literatura de cordel, poetisas, poesia feminina, cordel brasileiro, cultura popular, memória coletiva">
-  <meta name="author" content="Memórias das Poetisas da Literatura de Cordel">
-  <meta name="robots" content="index, follow">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Memórias das Poetisas da Literatura de Cordel">
-  <meta property="og:description" content="Mapeamento da poesia feminina na literatura de cordel brasileira. Vidas, obras e temas.">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Memórias da Poesia Popular: acervo digital de poetisas, biografias, obras e capas de folhetos da literatura de cordel.">
+  <meta name="theme-color" content="#7a263a">
+  <meta property="og:title" content="Memórias da Poesia Popular">
+  <meta property="og:description" content="Biografias, obras e capas de folhetos de poetisas da literatura de cordel.">
   <meta property="og:type" content="website">
-  <meta property="og:locale" content="pt_BR">
-
-  <title>Memórias das Poetisas da Literatura de Cordel</title>
-
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="../visual/styles.css">
+  <title>Memórias da Poesia Popular</title>
+  <link rel="icon" href="../elementos/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../visual/public.css">
 </head>
-<body>
+<body data-page="home">
+  <a class="skip-link" href="#conteudo-principal">Ir para o conteúdo</a>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- 1. Navbar (fixed, glassmorphism on scroll)             -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <nav class="navbar">
-    <div class="container">
-      <a href="index.html" class="font-display navbar-brand">Memórias das Poetisas da Literatura de Cordel</a>
-
-      <!-- Hamburger toggle (mobile) -->
-      <button class="navbar-toggle" aria-label="Abrir menu de navegação" aria-expanded="false">
-        <span></span>
-        <span></span>
-        <span></span>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="index.html" aria-label="Memórias da Poesia Popular — página inicial">
+        <span class="brand__title">Memórias</span>
+        <span class="brand__descriptor">da Poesia Popular</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation" aria-label="Abrir menu">
+        <span class="menu-toggle__lines" aria-hidden="true"></span>
       </button>
-
-      <!-- Nav links -->
-      <ul class="navbar-nav">
-        <li><a href="index.html" class="nav-link active">Início</a></li>
-        <li><a href="sobre.html" class="nav-link">Sobre</a></li>
-        <li><a href="biografias.html" class="nav-link">Biografias</a></li>
-        <li><a href="contato.html" class="nav-link">Contato</a></li>
-      </ul>
-    </div>
-  </nav>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- 2. Hero Section (full viewport height)                 -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <section class="hero">
-    <!-- Background pattern -->
-    <div class="hero-bg">
-      <!-- SVG PLACEHOLDER: background pattern -->
-    </div>
-
-    <!-- Decorative elements -->
-    <img src="../elementos/siteWix8.png" alt="Decor" class="decor-img decor-hero-left">
-    <img src="../elementos/siteWix7.png" alt="Decor" class="decor-img decor-hero-right">
-
-    <!-- Hero content -->
-    <div class="container">
-      <span class="hero-subtitle font-display">Bem-Vindo</span>
-      <h1 class="hero-title font-display" style="position: relative; display: inline-block;">
-        Mapeamento da Poesia Feminina na Literatura de Cordel Brasileira
-        <img src="../elementos/siteWix13.png" alt="Decor Pássaro" class="decor-img decor-hero-bird">
-      </h1>
-      <p class="hero-description">Vidas, Obras e Temas</p>
-
-      <div class="hero-cta">
-        <a href="biografias.html" class="btn btn-primary">Conhecer Poetisas</a>
-        <a href="sobre.html" class="btn btn-outline">Sobre o Projeto</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- 3. Section Divider                                     -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <div style="padding: 40px 0 0 0; margin-bottom: -30px; position: relative; z-index: 10;">
-    <img src="../elementos/siteWix.png" alt="Separador" class="decor-separator" style="display: block; margin: 0 auto; width: 70%; max-width: 650px; opacity: 0.8; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%); mask-image: linear-gradient(to bottom, transparent 0%, black 15%);">
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- 4. Poem Carousel (dark background)                     -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <section class="carousel-section decor-container">
-
-    <img src="../elementos/siteWix4.png" alt="Casa" class="decor-img decor-vozes-left">
-    <img src="../elementos/siteWix15.png" alt="Cordelistas" class="decor-img decor-vozes-right">
-
-    <div class="container">
-      <h2 class="section-title font-display">Vozes do Cordel</h2>
-
-      <div class="carousel-wrapper">
-        <!-- Slide 1 (active) -->
-        <div class="carousel-slide active">
-          <blockquote class="carousel-poem">
-            "No papel nasce meu canto<br>
-            Com coragem e direção<br>
-            Sou mulher, sou resistência<br>
-            Verso vivo em construção<br>
-            Minha voz não se silencia<br>
-            Viva rima, vira ação"
-          </blockquote>
-          <cite class="carousel-author">— Poetisa Anônima</cite>
-        </div>
-
-        <!-- Slide 2 -->
-        <div class="carousel-slide">
-          <blockquote class="carousel-poem">
-            "Cordel é voz de mulher<br>
-            Que ecoa pelo sertão<br>
-            É luta, é fé, é saber<br>
-            É a força da tradição"
-          </blockquote>
-          <cite class="carousel-author">— Voz Feminina do Cordel</cite>
-        </div>
-
-        <!-- Slide 3 -->
-        <div class="carousel-slide">
-          <blockquote class="carousel-poem">
-            "Nas páginas do cordel<br>
-            Minhas letras ganham vida<br>
-            Sou poetisa, sou donzela<br>
-            Da palavra destemida"
-          </blockquote>
-          <cite class="carousel-author">— Herança Cordelista</cite>
-        </div>
-
-        <!-- Carousel controls -->
-        <div class="carousel-controls">
-          <button class="carousel-btn carousel-prev" aria-label="Poema anterior">&#8249;</button>
-          <div class="carousel-dots">
-            <button class="carousel-dot active" aria-label="Ir para poema 1"></button>
-            <button class="carousel-dot" aria-label="Ir para poema 2"></button>
-            <button class="carousel-dot" aria-label="Ir para poema 3"></button>
-          </div>
-          <button class="carousel-btn carousel-next" aria-label="Próximo poema">&#8250;</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- 5. About Preview Section                               -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <section class="section decor-container">
-    <img src="../elementos/siteWix12.png" alt="Decor" class="decor-img decor-sobre-box-left">
-    <img src="../elementos/siteWix9.png" alt="Decor" class="decor-img decor-sobre-box-right">
-    
-    <div class="container reveal">
-      <h2 class="section-title font-display">Sobre o Projeto</h2>
-
-      <div class="card about-preview-card">
-        <p>
-          A presente pesquisa propõe a consolidação de uma ação integrada de cinco
-          Grupos de Pesquisa cadastrados no CNPq, voltada para a compreensão da
-          diversidade cultural brasileira, preservação da memória coletiva e
-          valorização da tradição popular produzida por mulheres.
-        </p>
-        <p>
-          Tem-se como objetivo geral mapear a produção poética feminina da
-          Literatura de Cordel, promovendo a visibilidade das poetisas e de suas
-          criações.
-        </p>
-        <div style="text-align: center; margin-top: var(--space-xl);">
-          <a href="sobre.html" class="btn btn-primary">Saiba Mais</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- 6. Parceiros e Apoio                                   -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <section class="partners-section">
-    <div class="container">
-      <h3>Apoio e Realização</h3>
-      <div class="partners-grid">
-        <img src="../logos/CNPq.png" alt="CNPq" title="Conselho Nacional de Desenvolvimento Científico e Tecnológico">
-        <img src="../logos/DCI.png" alt="DCI" title="Departamento de Ciência da Informação">
-        <img src="../logos/PPGCI.png" alt="PPGCI" title="Programa de Pós-Graduação em Ciência da Informação">
-        <img src="../logos/ACVPB.png" alt="ACVPB" title="Academia de Cordel do Vale do Paraíba">
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- 7. Footer                                              -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <footer class="footer">
-    <div class="container">
-      <span class="footer-brand font-display">Memórias das Poetisas da Literatura de Cordel</span>
-
-      <nav class="footer-nav">
-        <a href="index.html" class="nav-link">Início</a>
-        <a href="sobre.html" class="nav-link">Sobre</a>
-        <a href="biografias.html" class="nav-link">Biografias</a>
-        <a href="contato.html" class="nav-link">Contato</a>
+      <nav class="site-nav" id="site-navigation" aria-label="Navegação principal" data-open="false">
+        <a class="site-nav__link" href="index.html" aria-current="page">Início</a>
+        <a class="site-nav__link" href="sobre.html">Sobre</a>
+        <a class="site-nav__link" href="biografias.html">Poetisas</a>
+        <a class="site-nav__link" href="contato.html">Contato</a>
       </nav>
+    </div>
+  </header>
 
-      <div class="footer-divider"></div>
+  <div class="config-banner" data-config-banner role="status" hidden>
+    O acervo está em preparação. Novos registros serão publicados em breve.
+  </div>
+  <noscript>
+    <div class="config-banner">Ative o JavaScript para consultar o acervo digital.</div>
+  </noscript>
 
-      <div class="footer-bottom">
-        <p class="footer-copy">
-          &copy; 2026 Memórias das Poetisas da Literatura de Cordel. Todos os direitos reservados.
-        </p>
-        <div class="footer-credits">
-          <span class="footer-dev" title="Ilustração e Tipografia por Jackson">
-            <svg class="footer-dev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
-              <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
-              <path d="M2 2l7.586 7.586"></path>
-              <circle cx="11" cy="11" r="2"></circle>
-            </svg>
-            <span>Ilustração e Tipografia por <strong>Jackson</strong></span>
-          </span>
-          <a href="https://portsamuellmsa.vercel.app/" target="_blank" rel="noopener noreferrer" class="footer-dev" title="Desenvolvido por Samuel Lucas">
-            <svg class="footer-dev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="16 18 22 12 16 6"></polyline>
-              <polyline points="8 6 2 12 8 18"></polyline>
-            </svg>
-            <span>Desenvolvido por <strong>Samuel Lucas</strong></span>
-          </a>
+  <main id="conteudo-principal">
+    <section class="home-hero" aria-labelledby="titulo-principal">
+      <div class="shell home-hero__inner">
+        <div class="home-hero__copy">
+          <span class="eyebrow">Acervo digital UFPB</span>
+          <h1 id="titulo-principal">A memória das <span>poetisas</span> de cordel.</h1>
+          <p class="lede">Vidas, obras e folhetos reunidos em um espaço público para preservar e tornar visível a produção feminina da literatura de cordel.</p>
+          <div class="home-hero__actions">
+            <a class="button" href="biografias.html">Conhecer poetisas</a>
+            <a class="button button--secondary" href="sobre.html">Sobre o projeto</a>
+          </div>
+          <div class="pillars" aria-label="Conteúdo principal do acervo">
+            <div class="pillar"><strong>Biografias</strong><span>Histórias de vida e trajetória</span></div>
+            <div class="pillar"><strong>Obras</strong><span>Cordéis e folhetos catalogados</span></div>
+            <div class="pillar"><strong>Capas</strong><span>Imagens vinculadas a cada obra</span></div>
+          </div>
         </div>
+
+        <div class="matrix-art" aria-hidden="true">
+          <img class="matrix-art__main" src="../elementos/matriz-memoria.svg" alt="" width="720" height="720">
+          <span class="matrix-art__label">Memória em matriz</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="titulo-projeto">
+      <div class="shell project-intro">
+        <div class="project-intro__number" aria-hidden="true">01</div>
+        <div class="project-intro__copy">
+          <span class="eyebrow">Sobre o acervo</span>
+          <h2 class="display" id="titulo-projeto">Informação que valoriza quem produz.</h2>
+          <p class="lede">O Memórias da Poesia Popular é um projeto digital ligado à UFPB para organizar e apresentar poetisas, suas biografias, obras e capas de folhetos.</p>
+          <p>O acervo é pensado para crescer: cada poetisa pode ter uma página individual e obras registradas separadamente, sem transformar a coleção em uma sequência solta de imagens.</p>
+          <a class="text-link" href="sobre.html">Conhecer a proposta</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--deep" aria-labelledby="titulo-destaques">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">Poetisas</span>
+            <h2 id="titulo-destaques">Perfis em destaque</h2>
+          </div>
+          <div>
+            <p>Biografias e obras conectadas em uma leitura aberta ao público.</p>
+            <a class="text-link" href="biografias.html">Ver acervo completo</a>
+          </div>
+        </div>
+        <p class="catalog-status" data-featured-status aria-live="polite"></p>
+        <div class="feature-grid" data-featured-poetisas></div>
+        <noscript><p class="state-panel">Ative o JavaScript para consultar o acervo digital.</p></noscript>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="titulo-comentarios">
+      <div class="shell">
+        <div class="comments-panel">
+          <div class="comments-panel__intro">
+            <span class="eyebrow">Participação</span>
+            <h2 id="titulo-comentarios">Comentários</h2>
+          </div>
+          <div class="comments-panel__content">
+            <p>O espaço de comentários está preparado para receber contribuições com moderação. Nenhum comentário fictício é publicado enquanto a política de participação não for definida.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section class="supporters" aria-labelledby="titulo-apoiadores">
+    <div class="shell supporters__inner">
+      <h2 id="titulo-apoiadores">Apoio e realização</h2>
+      <div class="supporters__grid">
+        <div class="supporter"><img src="../logos/CNPq.png" alt="CNPq" width="720" height="222" loading="lazy" decoding="async"></div>
+        <div class="supporter"><img src="../logos/DCI.png" alt="DCI" width="720" height="371" loading="lazy" decoding="async"></div>
+        <div class="supporter"><img src="../logos/PPGCI.png" alt="PPGCI" width="720" height="368" loading="lazy" decoding="async"></div>
+        <div class="supporter"><img src="../logos/ACVPB.png" alt="ACVPB" width="360" height="540" loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <strong>Memórias da Poesia Popular</strong>
+            <span>Acervo digital de poetisas da literatura de cordel</span>
+          </div>
+          <nav class="footer-nav" aria-label="Navegação do rodapé">
+            <a href="index.html">Início</a>
+            <a href="sobre.html">Sobre</a>
+            <a href="biografias.html">Poetisas</a>
+            <a href="contato.html">Contato</a>
+          </nav>
+        </div>
+        <div>
+          <p>Um site aberto para conhecer biografias, obras e capas de folhetos vinculados às poetisas.</p>
+          <a class="text-link" href="admin.html">Acesso administrativo</a>
+        </div>
+      </div>
+      <section class="credits" aria-labelledby="titulo-creditos">
+        <h2 id="titulo-creditos">Créditos</h2>
+        <div class="credits__group">
+          <a class="credit-pill" href="https://portsamuellmsa.vercel.app/" target="_blank" rel="noopener noreferrer">Samuel Lucas</a>
+          <a class="credit-pill" href="https://miguelfernandes3d2-netizen.github.io/portifolio.green/" target="_blank" rel="noopener noreferrer">Miguel Fernandes</a>
+          <span class="credit-pill credit-pill--illustrator">Jackson — Ilustrador</span>
+        </div>
+      </section>
+      <div class="footer-bottom">
+        <span>© <span data-current-year>2026</span> Memórias da Poesia Popular.</span>
+        <span>Projeto acadêmico da UFPB</span>
       </div>
     </div>
   </footer>
 
-  <!-- Script -->
-  <script src="../back/script.js"></script>
+  <script src="../back/supabase-config.js"></script>
+  <script src="../back/acervo.js"></script>
+  <script src="../back/common.js"></script>
+  <script src="../back/home.js"></script>
 </body>
 </html>

@@ -3,19 +3,21 @@
 > Documento de recuperação de contexto. Leia este arquivo **obrigatoriamente** ao iniciar qualquer sessão de trabalho neste projeto (ver Regra 10 do `AGENTS.md`). Mantenha-o atualizado ao final de cada sessão.
 
 ## O que é o projeto
-Site **"Memórias das Poetisas da Literatura de Cordel"** — memorial/portal das poetisas da literatura de cordel, ligado a um trabalho acadêmico (UFPB). É uma cópia local/variante do site de referência `siterasc.vercel.app` (modelo Wix).
+Site **"Memórias da Poesia Popular"** — acervo digital das poetisas da literatura de cordel, ligado a um trabalho acadêmico (UFPB, PPGCi). O visual segue o novo design system (`visual/public.css`, tirado do build `Downloads/ufpb-main-modificado/ufpb-main`), aprovado pelo usuário.
 
 ## Estrutura
 - `AGENTS.md` — regras de trabalho (fonte canônica). **Consultar antes de agir.**
-- `requisitos.md` — pedidos da chefia (reunião 18/09, Karcia). Requisitos marcados com `[X]` são os que o usuario quer executar.
+- `requisitos.md` — pedidos da chefia (reunião 18/09, Karcia). Requisitos marcados com `[X]` são os que o usuário quer executar.
 - `design.md` — design system do site (paleta, tipografia, componentes). Fonte da conformidade visual.
-- `backend.md` — arquitetura/tecnologias/vulnerabilidades do modelo original (). Nada disso deve ser reproduzido.
+- `backend.md` — arquitetura/tecnologias/vulnerabilidades do modelo de referência. Nada disso deve ser reproduzido.
 - `memoria.md` — este arquivo.
+- `site/plano-supabase.md` — **plano do back-end do usuário (Supabase)**: tabelas `poetisas` + `admin_emails` (allowlist por e-mail), sem Storage, sem tabela de obras, com fallback estático de 8 poetisas. Fonte canônica da camada de dados.
 - `site/` — código do site:
-  - `estrutura/` — `index.html`, `sobre.html`, `biografias.html`, `contato.html`, `admin.html`.
-  - `visual/styles.css` — folha de estilo única.
-  - `back/script.js` — JS do site + `` (config pública do ).
-  - `elementos/` — imagens decorativas (xilogravura, nomeclatura Wix).
+  - `estrutura/` — `index.html`, `sobre.html`, `biografias.html`, `contato.html`, `poetisa.html` (nova), `admin.html` (reescrito para Supabase).
+  - `visual/public.css` — folha de estilo única (visual novo). `styles.css` antigo foi removido.
+  - `back/` — `supabase-config.js` (config Supabase, placeholder), `acervo.js` (Supabase REST + fallback estático + componentes), `common.js` (menu mobile + ano), `home.js`, `biografias.js`, `poetisa.js`.
+  - `elementos/` — novos SVGs (`favicon.svg`, `fio-memoria.svg`, `matriz-memoria.svg`) + PNGs `siteWix*.png` antigos (inutilizados, mantidos).
+  - `logos/` — novos logotipos redimensionados: `CNPq.png` (720x222), `DCI.png` (720x371), `PPGCI.png` (720x368), `ACVPB.png` (360x540).
 
 ## Regras de trabalho (resumo do AGENTS.md)
 - Executar apenas o que foi **solicitado** e **aprovado** (Regra 9 — plano + aprovação explícita).
@@ -24,32 +26,35 @@ Site **"Memórias das Poetisas da Literatura de Cordel"** — memorial/portal da
 - Todo requisito concluído entra em **"Requisitos Cumpridos"** no `requisitos.md` (Regra 8).
 
 ## Estado atual
-### Concluído (registrado no `requisitos.md`)
-- Crédito da tipografia de Jackson no rodapé.
-- "Capas e Folhetos" no modal de biografias (dados via `data-covers`, escapados/validados).
-- Página de contato incluída e linkada no menu.
-- Dados das poetisas: foto, nome, biografia e capas.
-- Ordem do apoio com ACVPB à direita (CNPq, DCI, PPGCI, ACVPB).
-- Jackson nos créditos como ilustrador.
+### Concluído
+- **Transplante visual completo** (aprovado pelo usuário): as 5 páginas públicas (`index`, `sobre`, `biografias`, `contato`, `poetisa`) reescritas com o visual novo; nome **"Memórias da Poesia Popular"** adotado.
+- Ordem dos apoiadores corrigida na do usuário: **CNPq, DCI, PPGCI, ACVPB**.
+- Créditos: **Samuel Lucas** (`portsamuellmsa.vercel.app`), **Miguel Fernandes** (`miguelfernandes3d2-netizen.github.io/portifolio.green/`), **Jackson — Ilustrador**.
+- Camada de dados nova conforme `plano-supabase.md`: `supabase-config.js` (placeholder) + `acervo.js` (REST p/ Supabase com fallback estático das 8 poetisas; sem innerHTML).
+- Backend antigo removido das páginas públicas: `back/script.js` e `visual/styles.css` apagados; páginas públicas agora usam apenas os `back/*.js` novos (leitura Supabase + fallback estático).
+- `acervo.js` (versão antiga) descartado a pedido do usuário ("NÃO QUERO NADA DO BACK ATUAL").
+- Migração `001_init.sql` do agente excluída (nunca persistiu; pasta `supabase/` removida).
 
 ### Pendente
-- **Req 06 — Comentários no lugar das "Vozes do Cordel"** (substituir o carrossel de poemas). ⚠️ A implementação foi feita e **revertida** por falta de autorização. Conteúdo dos comentários ainda indefinido — fazer apenas sob plano aprovado.
-- Req 03/04/05/07 — itens de verificação (site aberto, simplicidade/findability, sem classe temática, seguir modelo).
-- Backend/admin (Req 01, 10, 14, 15) — **pausados** por decisão da chefia ("só visual por enquanto").
+- **Verificação no navegador**: abrir as 5 páginas e testar grid, menu mobile, filtro de letras, busca, load more, perfil + lightbox, paths.
+- **Criar conta/projeto Supabase** (usuário) e preencher `supabase-config.js` (`url` + `anonKey` anônima). Enquanto vazio, o site usa o fallback estático.
+- **`admin.html` reescrito para Supabase** — Auth Google (allowlist `admin_emails`) + CRUD + campo de capas; aguarda conta/projeto Supabase e migração SQL para validar.
+- Req 06 — conteúdo da seção Comentários (painel já está montado, vazio, sem conteúdo fictício).
 
 ## Decisões-chave
-- **Requisição: só visual.** Backend/admin não serão tocados por ora.
-- Carrossel "Vozes do Cordel" → será substituído por seção de comentários (conteúdo a definir).
-- Dados de poetisas: foto, nome, biografia, capas. Sem classes/temas alheios ao modelo.
-- **Crédito do desenvolvedor é de Samuel Lucas** (portfolio `portsamuellmsa.vercel.app`) — substituiu o desenvolvedor antigo (Mikhael Coelho) no pill do rodapé das 4 páginas.
+- **Back-end do projeto = Supabase do `plano-supabase.md`** (escolha explícita do usuário). Sem o back do build novo (sem Storage, sem tabela `obras`, sem `status`, campos `video_url`/`covers` mantidos no schema do plano).
+- Card individual de poetisa incluído (`poetisa.html?slug=...`).
+- Fallback estático de 8 poetisas garante que o site nunca quebra sem o Supabase configurado.
+- Formulário de contato **desabilitado** (canal institucional em validação) até a UFPB confirmar o destino oficial.
+- Banner "em preparação" só aparece quando o banco devolve zero registros (com fallback, conteúdo é exibido normalmente).
+- Renderização dinâmica **sem innerHTML** (createElement + textContent) nos scripts novos.
 
-## Segurança (modelo original — não reproduzir)
-- Config do  é **pública** por design (front-end); proteção depende das regras do 
-- Admin original: `ALLOWED_EMAILS` vazio ⇒ qualquer conta Google entra na interface; porém **escrita/exclusão negadas** pelas regras ("Missing or insufficient permissions") — painel é somente leitura na prática.
-- Leitura da coleção `poetisas` é **pública** (necessária para o site carregar).
+## Segurança (modelo de referência — não reproduzir)
+- Chave `anon`/publishable do Supabase é **pública** por design (front-end); a proteção real é o **RLS deny-by-default**, nunca o segredo da chave. `service_role` jamais no client-side.
+- Admin: allowlist em `admin_emails`; **lista vazia = acesso negado** (deny-by-default), e a RLS barra escrita/exclusão sem e-mail autorizado — painel efetivamente somente leitura sem permissão.
+- Leitura das poetisas é **pública** (necessária ao site). Escrita restrita a `authenticated` + e-mail em `admin_emails` conforme `plano-supabase.md`.
 - Detalhes completos: `backend.md` (vulnerabilidades #1–#11).
 
 ## Convenções
-- Comentários de seção nos arquivos: linha de `═══ ═══` (55 caracteres) delimitando blocos numerados.
-- `script.js` em inglês; conteúdo do site em português.
+- Scripts novos: **português**, sem innerHTML, com helper `Acervo.createElement()` (usado somente para dados; conteúdo estático das páginas é HTML natural).
 - Cabeçalhos de seção em `.md` em português, títulos `###`.

@@ -1,99 +1,86 @@
 # Backend do Projeto
 
 ## Visão Geral
-Descrever a arquitetura e a implementação do backend.
+Arquitetura e implementação do back-end do site **"Memórias da Poesia Popular"**, baseado em **Supabase (PostgreSQL + Auth + RLS)** conforme `plano-supabase.md`.
 
 ## Arquitetura
-- **Confirmada pelo código do admin (`admin.html` publicado):** aplicação 100% client-side, sem backend próprio.
-- Admin = **um único HTML** com CSS e JavaScript inline; `` separado (mesma pasta no deploy original).
-- Dados direto no **** (coleção `poetisas`) via SDK compat 10.12.0 por CDN. Sem Cloud Functions, sem REST próprio, sem Storage (fotos são por URL).
+- **Confirmada pelo código:** aplicação 100% client-side, sem servidor próprio.
+- Admin = **um único HTML** (`admin.html`) com CSS e JavaScript inline; `supabase-config.js` separado (URL + chave `anon`/publishable).
+- Dados via **Supabase Data API (REST)** — SELECT público para o site; INSERT/UPDATE/DELETE restritos por **RLS** a usuários autenticados com e-mail na allowlist (`admin_emails`). Sem Storage (fotos e capas são por URL).
 
 ## Tecnologias
 - Linguagem: HTML/CSS/JS vanilla (sem framework).
-- Banco de dados:   (projeto `sitecassia-78403`).
-- Autenticação:  Auth — Google OAuth (popup).
-- Deploy: estático na Vercel.
+- Banco de dados: **PostgreSQL (Supabase)** — tabela `poetisas` (+ `admin_emails`).
+- Autenticação: **Google OAuth** via Supabase Auth; autorização por allowlist em `admin_emails` (deny-by-default).
+- Deploy: estático (Vercel ou hospedagem atual) + `vercel.json` para CSP/security headers.
 
 ## API / Endpoints
-- Não há API própria. Contra os SDKs do  (Auth + ) direto do navegador.
+- Sem API própria. As páginas usam a **Data API do Supabase** (`/rest/v1/...`) direto do navegador com a chave `anon` (pública por design). A barreira real é o **RLS deny-by-default**.
 
 ## Autenticação e Segurança
-- _Em construção_ (ver seção "Vulnerabilidades Conhecidas" abaixo).
+- Login do admin: Google OAuth (Supabase) → JWT no navegador.
+- `admin_emails`: lista de e-mails autorizados. **Lista vazia = acesso negado** (nunca permite "qualquer e-mail").
+- Toda política de escrita exige `authenticated` **e** e-mail presente em `admin_emails`.
+- Requisitos mínimos (nunca remover): deny-by-default, escape/validação de toda entrada antes do DOM, CSP no deploy, sem segredos no client-side, versões de SDK fixadas e registradas.
 
 ## Modelo de Dados
-- Coleção `poetisas`, documento por poetisa com: `name`, `subtitle`, `summary`, `bio`, `initials`, `letter`, `photoType` (`url`/`none`, com `upload` só como legado), `photoUrl`, `videoUrl`, `createdAt`, `updatedAt`.
+- Tabela `poetisas`: `id` (uuid PK), `name`, `initials`, `letter`, `subtitle`, `summary`, `bio`, `photo_type` (`url`/`none`), `photo_url`, `video_url`, `covers` (jsonb `[{src,title}]`), `created_at`, `updated_at`.
+- Tabela `admin_emails`: allowlist de e-mails.
 
 ## Deploy
-- _Em construção_
+- Estático; Supabase gerencia banco/auth. CSP restrito (`default-src 'self'`), `nosniff`, Referrer-Policy em `vercel.json`.
+
+---
 
 ## Vulnerabilidades Conhecidas — Não Reproduzir
 
-> Aviso: o usuário **não quer nenhuma** destas vulnerabilidades no site. Todo agente deve garantir que o código produzido não apresente falhas semelhantes. Todas abaixo foram identificadas no site de referência `siterasc.vercel.app` (código real analisado).
+> Aviso: o usuário **não quer nenhuma** destas vulnerabilidades no site. Todo agente deve garantir que o código produzido não apresente falhas semelhantes. Os itens abaixo são classes de falha identificadas no modelo de referência avaliado (código real analisado) e mapeadas para a mitigação atual no Supabase (ver `plano-supabase.md`, seção 4).
 
 ### 1. Login administrativo com lista de e-mails autorizados vazia (MÉDIA)
-- **Onde**: `admin.html` — `ALLOWED_EMAILS`.
-- **Problema**: lista vazia + `isEmailAllowed()` retorna `true` quando vazia. Qualquer conta Google entra na interface do painel, **mas** o impacto efetivo foi reduzido: teste real (19/09/2026) mostrou que as regras do  **negam escrita/exclusão** (`set` e `delete` → "Missing or insufficient permissions"). O painel é, na prática, **somente leitura**.
-- **Risco residual**: acesso indevido à interface e leitura dos dados; e se as regras forem afrouxadas no futuro, o mesmo login ganha CRUD total. O painel original provavelmente **não consegue salvar** poetisas.
-- **Prevenção**: deny-by-default. Lista de permissões obrigatória antes do deploy; ausência de configuração = acesso negado.
+- **Problema**: lista vazia + checagem que retorna `true` quando vazia. Qualquer conta Google entra na interface do painel.
+- **Prevenção (aplicada)**: deny-by-default. `admin_emails` é consultada via RLS; lista vazia ou erro = **acesso negado**.
 
 ### 2. XSS armazenado via dados do banco injetados em `innerHTML` (ALTA)
-- **Onde**: `script.js` público — `initDynamicBios()` e `initModals()`.
-- **Problema**: `p.name`, `p.summary`, `p.bio` e `p.photoUrl` são interpolados em `card.innerHTML`/`modalBody.innerHTML` **sem escapar** (o `escapeHtml` existe só no admin). Combinado com a falha #1, um atacante com acesso de escrita pode armazenar `<script>` ou atributos `onerror` que executam no navegador de qualquer visitante do site (stored XSS).
-- **Prevenção**: todo dado vindo do banco deve ser escapado antes do DOM (`escapeHtml`), ou renderizado com `textContent`.
+- **Problema**: campos do banco interpolados em `innerHTML` sem escapar ⇒ stored XSS no navegador de qualquer visitante.
+- **Prevenção (aplicada)**: todo dado do banco é escapado antes do DOM (`escapeHtml`) ou renderizado com `textContent` (site e admin).
 
 ### 3. Injeção em atributo `src` de imagem (ALTA)
-- **Onde**: `script.js` — `photoHTML = "<img src=\"${p.photoUrl}\" ...>"`. Também em `admin.html` — `renderCards()` usa `escapeHtml(p.photoUrl)` em `src`.
-- **Problema**: no site público, uma URL como `x" onerror="alert(1)` quebra o atributo e injeta código arbitrário. No admin, o `escapeHtml` protege contra quebra do atributo, **mas não sanitiza protocolo**: `javascript:`/`data:` passam (embora `javascript:` em `<img>` geralmente não execute nos browsers modernos, `data:` e SVG externo podem).
-- **Prevenção**: escapar atributos HTML **e** validar a URL (somente `http`/`https`, domínios confiáveis) antes de usar em `src`.
+- **Problema**: URL capciosa (`x" onerror="alert(1)`) quebra o atributo; protocolos `javascript:`/`data:` passam.
+- **Prevenção (aplicada)**: escapar atributos HTML **e** validar a URL (somente `http`/`https`) antes de usar em `src`; conversão automática de links do Google Drive.
 
 ### 4. Embed de vídeo por URL livre / domínios arbitrários (MÉDIA)
-- **Onde**: `script.js` — `convertToEmbed()`: `if (url.includes('embed') || url.includes('player')) return url;`.
-- **Problema**: qualquer domínio contendo "embed" ou "player" vira `src` de iframe, permitindo conteúdo externo não verificado (risco de clickjacking/phishing disfarçado).
-- **Prevenção**: aceitar apenas YouTube/Vimeo validados por regex de ID; nunca devolver URL de terceiros como iframe.
+- **Problema**: qualquer domínio contendo "embed" ou "player" vira `src` de iframe (clickjacking/phishing).
+- **Prevenção (aplicada)**: `convertToEmbed` aceita apenas YouTube/Vimeo validados por regex de ID; nunca devolve URL de terceiros como iframe.
 
-### 5. Regras do  como única barreira + config pública (ALTA)
-- **Onde**: `` — apiKey, projectId, etc. públicos por design no front-end.
-- **Problema**: como a config é visível para qualquer um, a proteção depende 100% das regras do  Devem ser deny-by-default: leitura pública só quando necessária (ex.: coleção de poetisas para o site) e **escrita restrita** a usuários autenticados **com permissão explícita** (ex.: custom claims), nunca um `if request.auth != null` genérico.
-- **Observado em teste (19/09/2026)**: leitura pública (o site carrega `poetisas` sem login) e **escrita/exclusão negadas** para usuário autenticado qualquer. O gabarito atual está seguro para escrita, mas a leitura aberta é necessária ao site — manter assim apenas se o conteúdo for público por design.
+### 5. Config pública + regras de banco como única barreira (ALTA)
+- **Problema**: chave `anon` é pública por design; proteção não pode depender do segredo da chave.
+- **Prevenção (aplicada)**: chave `secret`/`service_role` nunca no client-side; barreira real = **RLS deny-by-default + policies por operação/papel**; CORS restrito no dashboard.
 
 ### 6. Ausência de cabeçalhos de segurança / CSP (MÉDIA)
-- **Onde**: deploy Vercel — nenhuma `Content-Security-Policy`, `X-Content-Type-Options` ou `Referrer-Policy` (apenas HSTS automático da Vercel).
-- **Problema**: sem CSP, toda falha de XSS explora sem mitigação; sem `nosniff`, há risco de MIME sniffing.
-- **Prevenção**: adicionar CSP restrito (default-src 'self', frame-ancestors), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`.
+- **Prevenção (aplicada)**: CSP restrito (`default-src 'self'`), `X-Content-Type-Options: nosniff`, `Referrer-Policy` no deploy.
 
 ### 7. Código morto / sensível (BAIXA)
-- **Onde**: `admin.html` — `const AUTH_KEY = 'admin_auth';` declarada, nunca usada; e o branch legado `photoType === 'upload'` (a aba de upload foi removida do painel, só restam `url`/`none`, mas o tratamento de upload fica no código).
-- **Problema**: não é explorável diretamente, mas lixo de código indica segredos esquecidos e dificulta auditoria.
-- **Prevenção**: remover código morto; nunca armazenar segredos/sessões em constantes client-side.
+- **Problema**: constantes declaradas e nunca usadas, branches legados.
+- **Prevenção (aplicada)**: remoção de código morto (ex.: `AUTH_KEY`, branch `upload`); sem armazenar segredos/sessões em constantes client-side.
 
 ### 8. Sem rate limiting ou proteção contra força bruta (MÉDIA)
-- **Onde**: login admin (popup OAuth) e formulário de contato — sem limites.
-- **Problema**: login é mitigado parcialmente pelo Google OAuth, mas operações sensíveis devem ter limites.
-- **Prevenção**: configurar limites/regras no backend (ex.:  Security Rules por taxa se aplicável) e validar tudo server-side.
+- **Prevenção (aplicada)**: **Google OAuth** gerencia credenciais; CORS restrito; monitoração via logs de auditoria do Supabase.
 
 ### 9. Confiança apenas na validação client-side (MÉDIA)
-- **Onde**: formulário de contato — validação HTML apenas (`required`), sem processamento server-side.
-- **Problema**: hoje o formulário é estático (não envia nada), mas qualquer validação feita só no navegador é contornável.
-- **Prevenção**: toda entrada reenviada ao servidor deve ser validada/sanitizada no servidor.
+- **Prevenção (aplicada)**: a defesa real é server-side (RLS deny-by-default); validação no client é apenas UX.
 
 ### 10. Dependências e SDKs sem política de atualização (BAIXA)
-- **Onde**: jQuery-free, mas  SDK 10.12.0 fixo via CDN.
-- **Problema**: versões fixas pendentes de atualização acumulam falhas conhecidas.
-- **Prevenção**: registrar versões de dependências, manter SDKs atualizados e revisar CVEs relacionadas.
+- **Prevenção (aplicada)**: versão fixa do supabase-js por CDN, registrada no `plano-supabase.md` e revisada conforme `SKILL.md`.
 
-### 11. Injeção via `onclick` com ID de documento não escapado (MÉDIA)
-- **Onde**: `admin.html` — `renderCards()`: `onclick="editPoetisa('${p.id}')"` e `onclick="confirmDelete('${p.id}')"`.
-- **Problema**: o `p.id` vem do  e é interpolado dentro de atributo de handler sem escapar. Ids gerados automaticamente são seguros, mas um documento criado com **ID customizado** contendo `'` (ex.: `');alert(1)//`) quebra o atributo e executa código arbitrário no navegador da chefia.
-- **Prevenção**: não interpolar dados em atributos de handler — usar `addEventListener` + `dataset`/closure, ou escapar o id e restringir o conjunto de caracteres permitidos para IDs.
+### 11. Injeção via `onclick` com ID não escapado (MÉDIA)
+- **Prevenção (aplicada)**: sem `onclick` inline — `addEventListener` + `dataset`/closure (nunca interpolar dados em handler).
 
 ---
 **Práticas mínimas para este projeto (nunca remover):**
-- Deny-by-default em autenticação e regras de banco.
+- Deny-by-default em autenticação e regras de banco (RLS).
 - Escapar/validar toda entrada antes do DOM.
 - CSP e cabeçalhos de segurança no deploy.
 - Sem segredos no client-side; segredos sempre em variáveis de ambiente server-side.
-
-**Nova vulnerabilidade a registrar?** _Adicionar aqui._
 
 ---
 
@@ -168,7 +155,7 @@ ASI01 Goal Hijack (injecção + autonomia), ASI02 Tool Misuse, ASI03 Abuso de id
 
 ### Notas de segurança específicas do Supabase (arquitetura alvo)
 
-> Registradas aqui porque formam a base da proteção do novo backend (ver plano).
+> Registradas aqui porque formam a base da proteção do backend (ver `plano-supabase.md`).
 
 - **Chave `anon`/publishable (`sb_publishable_`) é pública por design** (fica no browser) — a proteção real é **100% RLS (deny-by-default)**, nunca o segredo da chave. Legacy `anon`/`service_role` deprecados até o fim de 2026.
 - **Chave `secret`/`service_role` NUNCA no client-side** — ela tem `BYPASSRLS`; expor = banco inteiro comprometido.

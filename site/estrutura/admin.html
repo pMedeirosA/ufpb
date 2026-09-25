@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Admin — Memórias das Poetisas da Literatura de Cordel</title>
+  <title>Painel Admin — Memórias da Poesia Popular</title>
   <style>
     /* ========== FONTE PERSONALIZADA ========== */
     @font-face {
@@ -513,6 +513,58 @@
       color: var(--brown-light);
     }
 
+    /* ========== CAPAS E FOLHETOS ========== */
+    .covers-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .btn-add-covers {
+      align-self: flex-start;
+      padding: 10px 14px;
+      background: var(--gold);
+      color: var(--brown);
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-add-covers:hover { background: var(--gold-light); }
+    .covers-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--beige);
+      border: 2px solid #e0d5c8;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      color: var(--brown);
+    }
+    .covers-row span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .covers-remove {
+      flex-shrink: 0;
+      background: rgba(192,57,43,0.1);
+      color: var(--danger);
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-family: inherit;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .covers-remove:hover { background: var(--danger); color: var(--white); }
+
     /* ========== ABAS DE TIPO DE FOTO ========== */
     .photo-tabs {
       display: flex; gap: 0;
@@ -727,7 +779,7 @@
   <div class="login-overlay" id="loginOverlay">
     <div class="login-card">
       <h1>Painel Admin</h1>
-      <p class="login-subtitle">Memórias das Poetisas da Literatura de Cordel</p>
+      <p class="login-subtitle">Memórias da Poesia Popular</p>
       <div id="loginArea">
         <button type="button" id="btnGoogleLogin" style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 24px;border:1px solid rgba(139,94,60,0.2);border-radius:8px;background:white;color:var(--brown);font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;">
           <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -748,7 +800,7 @@
 
     <!-- Barra lateral -->
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-brand">Memórias das Poetisas da Literatura de Cordel</div>
+      <div class="sidebar-brand">Memórias da Poesia Popular</div>
       <div class="sidebar-label">Painel Admin</div>
       <nav class="sidebar-nav">
         <a href="#" class="sidebar-link active" onclick="return false">
@@ -879,6 +931,18 @@
           <div class="video-preview" id="videoPreview"><iframe id="videoPreviewFrame" allowfullscreen></iframe></div>
         </div>
 
+        <!-- Capas e Folhetos -->
+        <div class="form-group">
+          <label class="form-label">Capas e Folhetos</label>
+          <div class="covers-form">
+            <input type="url" class="form-input" id="formCoverUrl" placeholder="https://exemplo.com/capa.jpg">
+            <input type="text" class="form-input" id="formCoverTitle" placeholder="Título da capa (opcional)">
+            <button type="button" class="btn-add-covers" id="btnAddCover">Adicionar capa</button>
+          </div>
+          <div id="coversList"></div>
+          <p style="font-size:0.8rem; color:var(--brown-light); margin-top:6px;">Use links diretos das imagens (Google Drive, Imgur, etc.).</p>
+        </div>
+
         <!-- Ações -->
         <div class="form-actions">
           <button type="submit" class="btn-save" id="btnSave">Salvar</button>
@@ -906,31 +970,28 @@
   <!-- ========== TOAST (NOTIFICAÇÃO) ========== -->
   <div class="toast" id="toast"></div>
 
-  <!-- ==========  SDK (Compat) ========== -->
-  <script src="https://www.gstatic.com/"></script>
-  <script src="https://www.gstatic.com/"></script>
-  <script src="https://www.gstatic.com/"></script>
-  <!-- Config compartilhado (edite  para configurar) -->
-  <script src="../back/"></script>
+  <!-- ========== SUPABASE (v2, versão fixa) + CONFIG ========== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4"></script>
+  <!-- Config compartilhado (edite supabase-config.js para configurar) -->
+  <script src="../back/supabase-config.js"></script>
 
   <script>
-    const poetisasRef = db.collection('poetisas');
+    const supabase = window.supabase.createClient(
+      SUPABASE_CONFIG.url,
+      SUPABASE_CONFIG.anonKey
+    );
 
     /* ============================================================
        CONSTANTES E ESTADO
     ============================================================ */
-    const AUTH_KEY = 'admin_auth';
-    // Emails autorizados a acessar o painel (adicione/remova conforme necessário)
-    const ALLOWED_EMAILS = [
-      // TODO: Adicione aqui os emails autorizados
-      // Ex: 'cliente@gmail.com',
-    ];
+    const POETISAS_SELECT = 'id,name,initials,letter,subtitle,summary,bio,photo_type,photo_url,video_url,covers,created_at,updated_at';
 
-    let poetisas = [];         // Lista local sincronizada com 
-    let deleteTargetId = null; // ID do documento a ser excluído
-    let deleteTargetData = null; // Dados do documento a ser excluído
+    let poetisas = [];          // Lista local sincronizada com o Supabase
+    let covers = [];            // Capas e folhetos do formulário
+    let deleteTargetId = null;  // ID do registro a ser excluído
     let currentPhotoType = 'url'; // Tipo de foto selecionado na aba
-    let isSaving = false;      // Flag para evitar duplo submit
+    let currentUserEmail = null; // E-mail autenticado
+    let isSaving = false;       // Flag para evitar duplo submit
 
     /* ============================================================
        FUNÇÕES UTILITÁRIAS
@@ -1041,83 +1102,115 @@
     }
 
     /* ============================================================
-       AUTENTICAÇÃO VIA GOOGLE OAUTH
+       AUTENTICAÇÃO VIA GOOGLE OAUTH (SUPABASE)
     ============================================================ */
-    const auth = ();
-    const googleProvider = new ();
 
-    function checkAuth() {
-      return auth.currentUser !== null;
-    }
-
-    function initAuth() {
+    function mostrarConfigPendente() {
       const overlay = document.getElementById('loginOverlay');
       const app = document.getElementById('app');
+      const loginArea = document.getElementById('loginArea');
+      const loading = document.getElementById('loginLoading');
+      const err = document.getElementById('loginError');
+      if (loginArea) loginArea.style.display = 'none';
+      if (loading) loading.style.display = 'none';
+      if (err) err.textContent = '';
+      overlay.classList.remove('hidden');
+      app.style.display = 'none';
+      const subtitle = document.querySelector('.login-subtitle');
+      if (subtitle) {
+        subtitle.textContent = 'Disponível após a configuração do Supabase (back/supabase-config.js).';
+      }
+    }
 
-      // Observa mudanças de estado de autenticação
-      auth.onAuthStateChanged(function(user) {
-        if (user && isEmailAllowed(user.email)) {
+    async function isEmailAllowed(email) {
+      if (!email) return false;
+      try {
+        const { data, error } = await supabase
+          .from('admin_emails')
+          .select('email')
+          .limit(500);
+        if (error || !Array.isArray(data)) return false;
+        return data.some(function (row) {
+          return String(row.email || '').toLowerCase() === email.toLowerCase();
+        });
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function initAuth() {
+      const overlay = document.getElementById('loginOverlay');
+      const app = document.getElementById('app');
+      const err = document.getElementById('loginError');
+      const loginArea = document.getElementById('loginArea');
+
+      if (typeof supabaseEstaConfigurado !== 'function' || !supabaseEstaConfigurado()) {
+        mostrarConfigPendente();
+        return;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+
+      if (sessionData && sessionData.session && sessionData.session.user) {
+        const email = String(sessionData.session.user.email || '').toLowerCase();
+        const allowed = email ? await isEmailAllowed(email) : false;
+        if (allowed) {
+          currentUserEmail = email;
           overlay.classList.add('hidden');
           app.style.display = 'flex';
-          // Atualiza nome do usuário no header se quiser
           const logoutBtn = document.getElementById('btnLogout');
-          if (logoutBtn) logoutBtn.title = 'Sair (' + user.email + ')';
+          if (logoutBtn) logoutBtn.title = 'Sair (' + email + ')';
           loadPoetisas();
-        } else if (user && !isEmailAllowed(user.email)) {
-          // Usuário logou mas email não autorizado
-          auth.signOut();
-          document.getElementById('loginError').textContent = 
-            'Acesso negado. O email "' + user.email + '" não está autorizado.';
-          overlay.classList.remove('hidden');
-          app.style.display = 'none';
-          document.getElementById('loginLoading').style.display = 'none';
-        } else {
-          overlay.classList.remove('hidden');
-          app.style.display = 'none';
-          document.getElementById('loginLoading').style.display = 'none';
+          return;
         }
-      });
-
-      // Botão de login com Google
-      document.getElementById('btnGoogleLogin').addEventListener('click', async function() {
-        const err = document.getElementById('loginError');
-        err.textContent = '';
-        document.getElementById('loginLoading').style.display = 'block';
-        this.style.display = 'none';
-
-        try {
-          await auth.signInWithPopup(googleProvider);
-        } catch (error) {
-          console.error('Erro no login:', error);
-          err.textContent = 'Erro ao fazer login. Tente novamente.';
-          document.getElementById('loginLoading').style.display = 'none';
-          this.style.display = 'flex';
+        if (email) {
+          await supabase.auth.signOut();
+          err.textContent = 'Acesso negado. O e-mail "' + email + '" não está autorizado.';
         }
-      });
+      }
+
+      if (loginArea) loginArea.style.display = 'block';
+      overlay.classList.remove('hidden');
+      app.style.display = 'none';
+      document.getElementById('loginLoading').style.display = 'none';
     }
 
-    function isEmailAllowed(email) {
-      if (!email) return false;
-      // Se a lista estiver vazia, permite qualquer email (para facilitar setup inicial)
-      if (ALLOWED_EMAILS.length === 0) return true;
-      return ALLOWED_EMAILS.includes(email.toLowerCase());
-    }
+    document.getElementById('btnGoogleLogin').addEventListener('click', async function () {
+      const err = document.getElementById('loginError');
+      const loading = document.getElementById('loginLoading');
+      err.textContent = '';
+      loading.style.display = 'block';
+      this.style.display = 'none';
+
+      const redirectTo = window.location.href.split('#')[0];
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: redirectTo }
+      });
+      if (error) {
+        console.error('Erro no login:', error);
+        err.textContent = 'Erro ao fazer login. Tente novamente.';
+        loading.style.display = 'none';
+        this.style.display = 'flex';
+      }
+    });
 
     /* ============================================================
-        — CARREGAR POETISAS
+       SUPABASE — CARREGAR POETISAS
     ============================================================ */
     async function loadPoetisas() {
       showLoading();
       try {
-        const snapshot = await poetisasRef.get();
-        poetisas = [];
-        snapshot.forEach(doc => {
-          poetisas.push({ id: doc.id, ...doc.data() });
-        });
+        const { data, error } = await supabase
+          .from('poetisas')
+          .select(POETISAS_SELECT)
+          .order('name', { ascending: true });
+        if (error) throw error;
+        poetisas = Array.isArray(data) ? data : [];
         renderCards();
       } catch (error) {
         console.error('Erro ao carregar poetisas:', error);
-        showToast('Erro ao carregar dados do ', 'error');
+        showToast('Erro ao carregar os dados do acervo.', 'error');
       } finally {
         hideLoading();
       }
@@ -1131,7 +1224,6 @@
       const empty = document.getElementById('emptyState');
       const count = document.getElementById('headerCount');
 
-      // Ordenar alfabeticamente
       poetisas.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR'));
 
       count.textContent = poetisas.length + (poetisas.length === 1 ? ' poetisa' : ' poetisas');
@@ -1144,36 +1236,38 @@
 
       empty.style.display = 'none';
 
-      grid.innerHTML = poetisas.map(p => {
-        // Determinar avatar: foto ou iniciais
+      grid.innerHTML = poetisas.map(function (p) {
         const hasPhoto = p.photoUrl && p.photoType !== 'none';
         const avatarContent = hasPhoto
-          ? `<img src="${escapeHtml(p.photoUrl)}" alt="${escapeHtml(p.name)}" loading="lazy">`
+          ? '<img src="' + escapeHtml(p.photoUrl) + '" alt="' + escapeHtml(p.name) + '" loading="lazy">'
           : escapeHtml(p.initials || '--');
 
-        // Badges informativos
         let badges = '';
         if (p.photoType === 'url') badges += '<span class="card-badge url">🔗 Imagem</span>';
         if (p.videoUrl) badges += '<span class="card-badge video">▶ Vídeo</span>';
+        const coversCount = Array.isArray(p.covers) ? p.covers.length : 0;
+        if (coversCount) {
+          badges += '<span class="card-badge">' + coversCount + ' capa' + (coversCount === 1 ? '' : 's') + '</span>';
+        }
 
-        return `
-          <div class="poetisa-card" data-id="${p.id}">
-            <div class="card-avatar">${avatarContent}</div>
-            <div class="card-body">
-              <div class="card-name">${escapeHtml(p.name)}</div>
-              <div class="card-subtitle">${escapeHtml(p.subtitle || '')}</div>
-              ${badges ? '<div class="card-meta-badges">' + badges + '</div>' : ''}
-            </div>
-            <div class="card-actions">
-              <button class="card-btn card-btn-edit" title="Editar" onclick="editPoetisa('${p.id}')">
-                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              </button>
-              <button class="card-btn card-btn-delete" title="Excluir" onclick="confirmDelete('${p.id}')">
-                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              </button>
-            </div>
-          </div>
-        `;
+        return (
+          '<div class="poetisa-card" data-id="' + escapeHtml(p.id) + '">' +
+            '<div class="card-avatar">' + avatarContent + '</div>' +
+            '<div class="card-body">' +
+              '<div class="card-name">' + escapeHtml(p.name) + '</div>' +
+              '<div class="card-subtitle">' + escapeHtml(p.subtitle || '') + '</div>' +
+              (badges ? '<div class="card-meta-badges">' + badges + '</div>' : '') +
+            '</div>' +
+            '<div class="card-actions">' +
+              '<button class="card-btn card-btn-edit" type="button" data-action="edit" title="Editar">' +
+                '<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+              '</button>' +
+              '<button class="card-btn card-btn-delete" type="button" data-action="delete" title="Excluir">' +
+                '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' +
+              '</button>' +
+            '</div>' +
+          '</div>'
+        );
       }).join('');
     }
 
@@ -1211,6 +1305,10 @@
       // Resetar vídeo
       document.getElementById('videoPreview').classList.remove('visible');
       document.getElementById('videoPreviewFrame').src = '';
+
+      // Resetar capas
+      covers = [];
+      renderCoversList();
 
       // Resetar estado de salvamento
       setFormDisabled(false);
@@ -1282,6 +1380,10 @@
       if (p.videoUrl) {
         updateVideoPreview(p.videoUrl);
       }
+
+      // Capas e folhetos
+      covers = Array.isArray(p.covers) ? p.covers.slice() : [];
+      renderCoversList();
 
       openPanel('Editar Poetisa');
     }
@@ -1364,6 +1466,7 @@
       const bio = document.getElementById('formBio').value.trim();
       const initialsInput = document.getElementById('formInitials').value.trim().toUpperCase();
       const videoUrlRaw = document.getElementById('formVideoUrl').value.trim();
+      const coversData = coletarCovers();
 
       // Validação
       if (!name) {
@@ -1375,58 +1478,46 @@
       showLoading();
 
       try {
-        // Iniciais: usar o valor do campo (editável) ou auto-gerar
         const initials = initialsInput.substring(0, 2) || getInitials(name);
         const letter = getLetter(name);
         const videoUrl = getEmbedUrl(videoUrlRaw) || '';
 
-        // Determinar foto
         let photoUrl = '';
         let photoType = currentPhotoType;
 
-        // ID do documento (novo ou existente)
-        let targetDocId = docId;
-        if (!targetDocId) {
-          const newDoc = poetisasRef.doc();
-          targetDocId = newDoc.id;
-        }
-
         if (photoType === 'url') {
           photoUrl = getDirectImageUrl(document.getElementById('formPhotoUrl').value.trim());
-          if (!photoUrl) {
-            photoType = 'none';
-          }
+          if (!photoUrl) photoType = 'none';
         } else {
           photoType = 'none';
           photoUrl = '';
         }
 
-        // Montar dados do documento
         const data = {
-          name,
-          subtitle,
-          summary,
-          bio,
-          initials,
-          letter,
-          photoType,
-          photoUrl,
-          videoUrl,
-          updatedAt: ()
+          name: name,
+          subtitle: subtitle,
+          summary: summary,
+          bio: bio,
+          initials: initials,
+          letter: letter,
+          photo_type: photoType,
+          photo_url: photoUrl,
+          video_url: videoUrl,
+          covers: coversData,
+          updated_at: new Date().toISOString()
         };
 
         if (docId) {
-          // Editar documento existente
-          await poetisasRef.doc(docId).update(data);
+          const { error } = await supabase.from('poetisas').update(data).eq('id', docId);
+          if (error) throw error;
           showToast('Poetisa atualizada com sucesso!', 'success');
         } else {
-          // Adicionar novo documento
-          data.createdAt = ();
-          await poetisasRef.doc(targetDocId).set(data);
+          data.created_at = new Date().toISOString();
+          const { error } = await supabase.from('poetisas').insert(data);
+          if (error) throw error;
           showToast('Poetisa adicionada com sucesso!', 'success');
         }
 
-        // Recarregar lista
         await loadPoetisas();
         closePanel();
 
@@ -1446,7 +1537,6 @@
       const p = poetisas.find(x => x.id === id);
       if (!p) return;
       deleteTargetId = id;
-      deleteTargetData = p;
       document.getElementById('confirmMessage').textContent =
         `Tem certeza que deseja excluir "${p.name}"? Esta ação não pode ser desfeita.`;
       document.getElementById('confirmOverlay').classList.add('active');
@@ -1461,8 +1551,8 @@
       showLoading();
 
       try {
-        // Excluir documento do 
-        await poetisasRef.doc(deleteTargetId).delete();
+        const { error } = await supabase.from('poetisas').delete().eq('id', deleteTargetId);
+        if (error) throw error;
 
         showToast('Poetisa excluída com sucesso.', 'success');
         await loadPoetisas();
@@ -1480,7 +1570,6 @@
 
     function closeConfirm() {
       deleteTargetId = null;
-      deleteTargetData = null;
       document.getElementById('confirmOverlay').classList.remove('active');
     }
 
@@ -1493,74 +1582,106 @@
     }
 
     /* ============================================================
+       CAPAS E FOLHETOS
+    ============================================================ */
+    function coletarCovers() {
+      return covers.filter(function (c) {
+        return c && typeof c.src === 'string' && c.src.indexOf('http') === 0;
+      });
+    }
+
+    function renderCoversList() {
+      const list = document.getElementById('coversList');
+      if (!list) return;
+      list.innerHTML = '';
+      covers.forEach(function (c, index) {
+        const row = document.createElement('div');
+        row.className = 'covers-row';
+        const label = document.createElement('span');
+        label.textContent = c.title || ('Capa ' + (index + 1));
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'covers-remove';
+        btn.textContent = 'Remover';
+        btn.setAttribute('aria-label', 'Remover capa ' + (index + 1));
+        btn.addEventListener('click', function () {
+          covers.splice(index, 1);
+          renderCoversList();
+        });
+        row.append(label, btn);
+        list.append(row);
+      });
+    }
+
+    function handleAddCover() {
+      const srcUrl = document.getElementById('formCoverUrl').value.trim();
+      const title = document.getElementById('formCoverTitle').value.trim();
+      if (!srcUrl || srcUrl.indexOf('http') !== 0) {
+        showToast('Informe uma URL de imagem válida (http/https).', 'error');
+        return;
+      }
+      covers.push({ src: srcUrl, title: title });
+      document.getElementById('formCoverUrl').value = '';
+      document.getElementById('formCoverTitle').value = '';
+      renderCoversList();
+    }
+
+    /* ============================================================
        INICIALIZAÇÃO
     ============================================================ */
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       initAuth();
 
-      // Se já autenticado, carregar dados imediatamente
-      if (checkAuth()) {
-        document.getElementById('app').style.display = 'flex';
-        loadPoetisas();
-      }
-
-      // === Event Listeners ===
-
-      // Adicionar nova poetisa
       document.getElementById('btnAdd').addEventListener('click', openAddForm);
-
-      // Fechar painel
       document.getElementById('panelOverlay').addEventListener('click', closePanel);
       document.getElementById('panelClose').addEventListener('click', closePanel);
       document.getElementById('btnFormCancel').addEventListener('click', closePanel);
-
-      // Submeter formulário
       document.getElementById('poetisaForm').addEventListener('submit', handleFormSubmit);
-
-      // URL de foto — preview ao digitar
       document.getElementById('formPhotoUrl').addEventListener('input', handlePhotoUrlInput);
-
-      // URL de vídeo — preview ao digitar
       document.getElementById('formVideoUrl').addEventListener('input', handleVideoUrlInput);
 
-      // Abas de tipo de foto
-      document.querySelectorAll('.photo-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
+      document.querySelectorAll('.photo-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
           setPhotoTab(this.dataset.tab);
         });
       });
 
-      // Nome → iniciais em tempo real
-      document.getElementById('formName').addEventListener('input', function() {
+      document.getElementById('formName').addEventListener('input', function () {
         updateInitialsFromName(this.value);
       });
 
-      // Iniciais manuais → atualizar badge
-      document.getElementById('formInitials').addEventListener('input', function() {
+      document.getElementById('formInitials').addEventListener('input', function () {
         const val = this.value.toUpperCase().substring(0, 2);
         document.getElementById('initialsBadge').textContent = val || '--';
       });
 
-      // Confirmar exclusão
+      document.getElementById('btnAddCover').addEventListener('click', handleAddCover);
+
+      document.getElementById('cardGrid').addEventListener('click', function (event) {
+        const button = event.target.closest('[data-action]');
+        if (!button) return;
+        const card = button.closest('[data-id]');
+        if (!card) return;
+        const id = card.getAttribute('data-id');
+        if (button.getAttribute('data-action') === 'edit') editPoetisa(id);
+        else if (button.getAttribute('data-action') === 'delete') confirmDelete(id);
+      });
+
       document.getElementById('btnConfirmDelete').addEventListener('click', executeDelete);
       document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirm);
-      document.getElementById('confirmOverlay').addEventListener('click', function(e) {
+      document.getElementById('confirmOverlay').addEventListener('click', function (e) {
         if (e.target === this) closeConfirm();
       });
 
-      // Logout via  Auth
-      document.getElementById('btnLogout').addEventListener('click', function() {
-        ().signOut().then(() => {
-          location.reload();
-        });
+      document.getElementById('btnLogout').addEventListener('click', async function () {
+        await supabase.auth.signOut();
+        location.reload();
       });
 
-      // Sidebar mobile
       document.getElementById('mobileToggle').addEventListener('click', toggleSidebar);
       document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
 
-      // Tecla Escape para fechar painéis
-      document.addEventListener('keydown', function(e) {
+      document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
           if (document.getElementById('confirmOverlay').classList.contains('active')) {
             closeConfirm();

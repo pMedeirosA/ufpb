@@ -1,174 +1,153 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Entre em contato com o projeto Memórias das Poetisas da Literatura de Cordel. Contribua com informações sobre poetisas do cordel brasileiro.">
-  <meta name="keywords" content="contato, poetisas, literatura de cordel, cordel feminino, UFPB, PPGCi">
-  <meta name="author" content="Memórias das Poetisas da Literatura de Cordel">
-  <title>Contato — Memórias das Poetisas da Literatura de Cordel</title>
-  <link rel="stylesheet" href="../visual/styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Canal de contato do Memórias da Poesia Popular, projeto digital da UFPB.">
+  <meta name="theme-color" content="#7a263a">
+  <title>Contato — Memórias da Poesia Popular</title>
+  <link rel="icon" href="../elementos/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../visual/public.css">
 </head>
-<body>
+<body data-page="contact">
+  <a class="skip-link" href="#conteudo-principal">Ir para o conteúdo</a>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- NAVBAR (fixa, compartilhada)                            -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <nav class="navbar">
-    <div class="container">
-      <a href="index.html" class="font-display navbar-brand">Memórias das Poetisas da Literatura de Cordel</a>
-
-      <!-- Hamburger toggle (mobile) -->
-      <button class="navbar-toggle" aria-label="Abrir menu de navegação">
-        <span></span>
-        <span></span>
-        <span></span>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="index.html" aria-label="Memórias da Poesia Popular — página inicial">
+        <span class="brand__title">Memórias</span>
+        <span class="brand__descriptor">da Poesia Popular</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation" aria-label="Abrir menu">
+        <span class="menu-toggle__lines" aria-hidden="true"></span>
       </button>
-
-      <!-- Nav links -->
-      <ul class="navbar-nav">
-        <li><a href="index.html" class="nav-link">Início</a></li>
-        <li><a href="sobre.html" class="nav-link">Sobre</a></li>
-        <li><a href="biografias.html" class="nav-link">Biografias</a></li>
-        <li><a href="contato.html" class="nav-link active">Contato</a></li>
-      </ul>
+      <nav class="site-nav" id="site-navigation" aria-label="Navegação principal" data-open="false">
+        <a class="site-nav__link" href="index.html">Início</a>
+        <a class="site-nav__link" href="sobre.html">Sobre</a>
+        <a class="site-nav__link" href="biografias.html">Poetisas</a>
+        <a class="site-nav__link" href="contato.html" aria-current="page">Contato</a>
+      </nav>
     </div>
-  </nav>
+  </header>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- PAGE HERO                                              -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <section class="page-hero decor-container">
-    <img src="../elementos/siteWix2.png" alt="Decor" class="decor-img decor-contato-left">
-    <img src="../elementos/siteWix6.png" alt="Decor" class="decor-img decor-contato-right">
-    <h1 class="page-hero-title font-display">Entre em Contato</h1>
-    <p class="page-hero-subtitle">Conecte-se com a Arte do Cordel Feminino</p>
-  </section>
+  <div class="config-banner" data-config-banner role="status" hidden>
+    O acervo está em preparação. Novos registros serão publicados em breve.
+  </div>
+  <noscript>
+    <div class="config-banner">Ative o JavaScript para consultar o acervo digital.</div>
+  </noscript>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- SEÇÃO DE CONTATO                                       -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <section class="section">
-    <div class="container">
-      <div class="contact-wrapper">
+  <main id="conteudo-principal">
+    <header class="page-hero">
+      <div class="shell page-hero__inner">
+        <div>
+          <span class="eyebrow">Contato</span>
+          <h1>Fale com o projeto.</h1>
+        </div>
+        <p>Use este espaço para enviar somente depois que a instituição confirmar o canal oficial de atendimento.</p>
+      </div>
+    </header>
 
-        <!-- Left column — Contact info -->
-        <div class="contact-info reveal-left">
-          <h2 class="font-display">Fale Conosco</h2>
-          <p>Tem interesse em saber mais sobre o projeto? Quer contribuir com informações sobre poetisas do cordel? Entre em contato conosco.</p>
-
-          <!-- Email -->
-          <div class="contact-detail">
-            <span class="contact-detail-icon">✉</span>
-            <span>contato@poetisasdocordel.com.br</span>
+    <section class="section" aria-labelledby="titulo-contato">
+      <div class="shell contact-layout">
+        <div>
+          <span class="eyebrow">Antes de enviar</span>
+          <h2 class="display" id="titulo-contato">Informação verificável.</h2>
+          <div class="contact-note">
+            <p><strong>Canal institucional em validação.</strong></p>
+            <p>O projeto ainda não possui um e-mail ou serviço de recebimento confirmado. Por isso, o formulário permanece desabilitado até que a UFPB forneça um destino oficial.</p>
           </div>
-
-          <!-- Location -->
-          <div class="contact-detail">
-            <span class="contact-detail-icon">📍</span>
-            <span>UFPB — João Pessoa, Paraíba</span>
-          </div>
-
-          <!-- Institution -->
-          <div class="contact-detail">
-            <span class="contact-detail-icon">🏛</span>
-            <span>PPGCi — Programa de Pós-Graduação em Ciência da Informação</span>
+          <div class="contact-note">
+            <p><strong>Localização e vínculo</strong></p>
+            <p>UFPB — João Pessoa, Paraíba.</p>
+            <p>PPGCi — Programa de Pós-Graduação em Ciência da Informação.</p>
           </div>
         </div>
 
-        <!-- Right column — Contact form -->
-        <div class="contact-form-card reveal-right">
-          <form id="contact-form">
-
-            <!-- Name + Surname row -->
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="contact-name">Nome</label>
-                <input class="form-input" type="text" id="contact-name" name="contact-name" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="contact-surname">Sobrenome</label>
-                <input class="form-input" type="text" id="contact-surname" name="contact-surname">
-              </div>
+        <div class="form-card">
+          <form id="contact-form" class="form-grid" data-contact-form novalidate hidden>
+            <div class="form-field form-field--full">
+              <label for="contact-name">Nome</label>
+              <input id="contact-name" name="name" type="text" autocomplete="name" maxlength="120" required>
             </div>
-
-            <!-- Email -->
-            <div class="form-group">
-              <label class="form-label" for="contact-email">Email</label>
-              <input class="form-input" type="email" id="contact-email" name="contact-email" required>
+            <div class="form-field form-field--full">
+              <label for="contact-email">E-mail</label>
+              <input id="contact-email" name="email" type="email" autocomplete="email" maxlength="180" required>
             </div>
-
-            <!-- Message -->
-            <div class="form-group">
-              <label class="form-label" for="contact-message">Mensagem</label>
-              <textarea class="form-textarea" id="contact-message" name="contact-message" required></textarea>
+            <div class="form-field form-field--full">
+              <label for="contact-message">Mensagem</label>
+              <textarea id="contact-message" name="message" maxlength="3000" required></textarea>
+              <small>Não envie dados sensíveis ou arquivos pessoais.</small>
             </div>
-
-            <!-- Submit -->
-            <button type="submit" class="btn btn-primary form-submit">Enviar Mensagem</button>
+            <div class="form-field visually-hidden" aria-hidden="true">
+              <label for="contact-company">Não preencha este campo</label>
+              <input id="contact-company" name="company" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            <p class="form-message form-field--full" data-contact-message aria-live="polite"></p>
+            <div class="form-actions form-field--full">
+              <button class="button" type="submit" data-contact-submit>Enviar mensagem</button>
+            </div>
           </form>
+          <div class="state-panel" data-contact-disabled>
+            <div class="state-panel__inner">
+              <h3>Formulário temporariamente indisponível</h3>
+              <p>Ative o formulário somente após a confirmação do e-mail ou serviço institucional responsável.</p>
+            </div>
+          </div>
         </div>
+      </div>
+    </section>
+  </main>
 
-      </div><!-- /contact-wrapper -->
-    </div><!-- /container -->
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- Parceiros e Apoio                                      -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <section class="partners-section">
-    <div class="container">
-      <h3>Apoio e Realização</h3>
-      <div class="partners-grid">
-        <img src="../logos/CNPq.png" alt="CNPq" title="Conselho Nacional de Desenvolvimento Científico e Tecnológico">
-        <img src="../logos/DCI.png" alt="DCI" title="Departamento de Ciência da Informação">
-        <img src="../logos/PPGCI.png" alt="PPGCI" title="Programa de Pós-Graduação em Ciência da Informação">
-        <img src="../logos/ACVPB.png" alt="ACVPB" title="Academia de Cordel do Vale do Paraíba">
+  <section class="supporters" aria-labelledby="titulo-apoiadores">
+    <div class="shell supporters__inner">
+      <h2 id="titulo-apoiadores">Apoio e realização</h2>
+      <div class="supporters__grid">
+        <div class="supporter"><img src="../logos/CNPq.png" alt="CNPq" width="720" height="222" loading="lazy" decoding="async"></div>
+        <div class="supporter"><img src="../logos/DCI.png" alt="DCI" width="720" height="371" loading="lazy" decoding="async"></div>
+        <div class="supporter"><img src="../logos/PPGCI.png" alt="PPGCI" width="720" height="368" loading="lazy" decoding="async"></div>
+        <div class="supporter"><img src="../logos/ACVPB.png" alt="ACVPB" width="360" height="540" loading="lazy" decoding="async"></div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- FOOTER (compartilhado)                                  -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <footer class="footer">
-    <div class="container">
-      <span class="footer-brand font-display">Memórias das Poetisas da Literatura de Cordel</span>
-
-      <nav class="footer-nav">
-        <a href="index.html">Início</a>
-        <a href="sobre.html">Sobre</a>
-        <a href="biografias.html">Biografias</a>
-        <a href="contato.html">Contato</a>
-      </nav>
-
-      <div class="footer-divider"></div>
-
-      <div class="footer-bottom">
-        <p class="footer-copy">&copy; 2026 Memórias das Poetisas da Literatura de Cordel. Todos os direitos reservados.</p>
-        <div class="footer-credits">
-          <span class="footer-dev" title="Ilustração e Tipografia por Jackson">
-            <svg class="footer-dev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
-              <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
-              <path d="M2 2l7.586 7.586"></path>
-              <circle cx="11" cy="11" r="2"></circle>
-            </svg>
-            <span>Ilustração e Tipografia por <strong>Jackson</strong></span>
-          </span>
-          <a href="https://portsamuellmsa.vercel.app/" target="_blank" rel="noopener noreferrer" class="footer-dev" title="Desenvolvido por Samuel Lucas">
-            <svg class="footer-dev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="16 18 22 12 16 6"></polyline>
-              <polyline points="8 6 2 12 8 18"></polyline>
-            </svg>
-            <span>Desenvolvido por <strong>Samuel Lucas</strong></span>
-          </a>
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <strong>Memórias da Poesia Popular</strong>
+            <span>Acervo digital de poetisas da literatura de cordel</span>
+          </div>
+          <nav class="footer-nav" aria-label="Navegação do rodapé">
+            <a href="index.html">Início</a>
+            <a href="sobre.html">Sobre</a>
+            <a href="biografias.html">Poetisas</a>
+            <a href="contato.html">Contato</a>
+          </nav>
         </div>
+        <div>
+          <p>Um site aberto para conhecer biografias, obras e capas de folhetos vinculados às poetisas.</p>
+          <a class="text-link" href="admin.html">Acesso administrativo</a>
+        </div>
+      </div>
+      <section class="credits" aria-labelledby="titulo-creditos">
+        <h2 id="titulo-creditos">Créditos</h2>
+        <div class="credits__group">
+          <a class="credit-pill" href="https://portsamuellmsa.vercel.app/" target="_blank" rel="noopener noreferrer">Samuel Lucas</a>
+          <a class="credit-pill" href="https://miguelfernandes3d2-netizen.github.io/portifolio.green/" target="_blank" rel="noopener noreferrer">Miguel Fernandes</a>
+          <span class="credit-pill credit-pill--illustrator">Jackson — Ilustrador</span>
+        </div>
+      </section>
+      <div class="footer-bottom">
+        <span>© <span data-current-year>2026</span> Memórias da Poesia Popular.</span>
+        <span>Projeto acadêmico da UFPB</span>
       </div>
     </div>
   </footer>
 
-  <!-- Script -->
-  <script src="../back/script.js"></script>
+  <script src="../back/supabase-config.js"></script>
+  <script src="../back/acervo.js"></script>
+  <script src="../back/common.js"></script>
 </body>
 </html>

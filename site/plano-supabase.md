@@ -1,13 +1,12 @@
 # Plano de Implementação — Sistema de Cadastro de Poetisas com Supabase
 
-> Documento técnico de planejamento. Este arquivo descreve, de ponta a ponta, a migração da
-> camada de dados do site "Memórias das Poetisas da Literatura de Cordel" do **
-> ** para **Supabase (PostgreSQL + Auth + RLS)**, conforme plano aprovado em
-> 21/09/2026.
+> Documento técnico de planejamento. Este arquivo descreve, de ponta a ponta, a camada de
+> dados do site "Memórias da Poesia Popular" sobre **Supabase (PostgreSQL + Auth + RLS)**,
+> conforme plano aprovado em 21/09/2026.
 >
 > Fonte de rigor: `AGENTS.md` (Regras 5, 6, 7, 8, 9), `design.md` (conformidade visual),
-> `backend.md` (vulnerabilidades que não podem ser reproduzidas), `requisitos.md` (pedidos da
-> chefia), `SKILL.md` (práticas de backend com IA — **documento canônico ao iniciar qualquer
+> `backend.md` (arquitetura e segurança do back-end), `requisitos.md` (pedidos da chefia),
+> `SKILL.md` (práticas de backend com IA — **documento canônico ao iniciar qualquer
 > tarefa de backend**), `memoria.md` (contexto).
 
 ---
@@ -18,57 +17,40 @@ O objetivo é atender os requisitos pendentes da chefia (Reunião 18/09, Karcia)
 **mínimo, simples e de longa duração**:
 
 - Painel admin para **adicionar/editar/excluir poetisas** (nome, biografia, foto, capas).
-- Site público mantém leitura aberta, **sem nenhuma mudança visual** (Regra 5).
-- **Supabase no lugar do **, seguindo a decisão da chefia de priorizar um banco
-  padrão (PostgreSQL) com portabilidade de dados a longo prazo.
+- Site público mantém leitura aberta, sem mudanças visuais não aprovadas (Regra 5).
+- **Supabase** como back-end padrão (PostgreSQL) com portabilidade de dados a longo prazo.
 
-Princípio central (backup de `backend.md`): segurança **deny-by-default** em regras
-(antes  → agora **RLS**), validação e escape de toda entrada (XSS), sem segredos no
-client-side, CSP no deploy.
+Princípio central (ver `backend.md`): segurança **deny-by-default** via **RLS**, validação e
+escape de toda entrada (XSS), sem segredos no client-side, CSP no deploy.
 
 ---
 
 ## 2. Arquitetura alvo
 
 ```
-[admin.html] ── anon/publishable key + Google OAuth (JWT) ──▶ Supabase Auth/ 
-                  (na verdade: Supabase Auth + PostgreSQL via Data API)
+[admin.html] ── anon/publishable key + Google OAuth (JWT) ──▶ Supabase Auth + Data API
         │  INSERT/UPDATE/DELETE  → RLS: authenticated + e-mail na allowlist
         ▼
 [PostgreSQL — Supabase]  tabela `poetisas` (+ `admin_emails`)
         ▲
         │  SELECT (público) → RLS: anon
-[biografias.html] ── anon/publishable key ──▶ SELECT público onde a chefia lista as poetisas
+[páginas públicas] ── anon/publishable key ──▶ SELECT público
 ```
 
 - **Aplicação 100% client-side, sem framework** (convenção do projeto: HTML/CSS/JS vanilla).
-- **Supabase** substitui o : Postgres real, Auth com Google OAuth, **RLS** como
-  barreira de segurança (substitui as regras do ).
-- Dados continuam na nuvem, mas em **Postgres serializável e portável** — a crítica da
-  chefia: "futuro incerto, inúmeras incógnitas" foi respondida com um banco **padrão da
-  indústria**, sem lock-in proprietário de documento (NoSQL ).
+- **Supabase**: Postgres real, Auth com Google OAuth e **RLS** como barreira de segurança.
+- Dados na nuvem em **Postgres serializável e portável** — banco padrão da indústria, sem
+  lock-in proprietário de documento.
 
-### Por que Supabase e não outra opção (decisão da chefia, registrada em 21/09/2026)
-
-| Critério (longo prazo, sem considerar o projeto atual) | Supabase |  | Git-files (Decap) |
-|---|---|---|---|
-| Dados portáveis (exportação) | ✅ PostgreSQL universal | ⚠️  proprietário | ✅✅ Arquivos brutos |
-| Depende de console/conta | ⚠️ Console (portátil) | ❌ Firme (Google) | ✅ Só repositório |
-| Custo imprevisível | ✅ Free hoje | ⚠️ Políticas mudaram (2026) | ✅🤖 Zero recorrente |
-| Qd. knowledge disponível | ✅ SQL (padrão) | ⚠️ NoSQL niche | ⚠️ Git + CMS |
-| Admin não técnico edita | ✅ | ✅ | ✅ (via CMS) |
-| Escala futura | ✅✅ | ✅ | ✅ suficiente |
-
-**Decisão**: **Supabase**. Recomendação para projetos do zero; no atual, o modelo já está
-integrado com , mas a chefia pediu priorizar **independência e longevidade** → Supabase.
-_(Nota: se não houvesse projeto existente, a recomendação "ideal-teórica" seria também Supabase
-pela portabilidade SQL, com Git-files como alternativa de máxima posse de dados.)_
+**Decisão registrada (21/09/2026):** Supabase. Recomendação para projetos do zero e também
+para o atual, pela portabilidade SQL (com Git-files como alternativa de máxima posse de dados,
+mas sem console/banco administrável pela chefia).
 
 ---
 
 ## 3. Modelo de dados (PostgreSQL)
 
-Coleção/tabela `poetisas` (substitui a coleção  `poetisas`):
+Tabela `poetisas`:
 
 | Coluna | Tipo | Obrig. | Observação |
 |---|---|---|---|
@@ -85,14 +67,14 @@ Coleção/tabela `poetisas` (substitui a coleção  `poetisas`):
 | `covers` | `jsonb` DEFAULT `'[]'` | opc. | 🆕 **Array de capas**: `[{src, title}]` |
 | `created_at` / `updated_at` | `timestamptz` | auto | auditoria |
 
-Tabela auxiliar `admin_emails` — allowlist de e-mails autorizados (resolve de vez a
-vulnerabilidade #1 do `backend.md`: **lista vazia = acesso negado**).
+Tabela auxiliar `admin_emails` — allowlist de e-mails autorizados. **Lista vazia = acesso
+negado (deny-by-default)**; nunca permite "qualquer e-mail".
 
 ---
 
-## 4. Segurança — deny-by-default (corrige as 11 vulnerabilidades do `backend.md`)
+## 4. Segurança — deny-by-default (conforme `backend.md`)
 
-A proteção passa a ser **Row Level Security (RLS)**, política **deny-by-default**:
+A proteção é **Row Level Security (RLS)**, política **deny-by-default**:
 
 ```sql
 -- habilitar RLS em toda tabela exposta
@@ -111,66 +93,61 @@ create policy "poetisas admin write" on poetisas
 -- iguais para update/delete
 ```
 
-### Mapa vulnerabilidades originais → mitigação no Supabase
+### Requisitos de segurança (checklist `backend.md`)
 
-| # | Vulnerabilidade (backend.md) | Solução neste plano |
+| # | Requisito | Solução neste plano |
 |---|---|---|
-| 1 | Login com allowlist vazia (qualquer Google entra) | **allowlist obrigatória** (`admin_emails`); lista vazia = deny; **deny-forever** |
-| 2/3 | XSS/escrita no banco → innerHTML sem escape | `escapeHtml` em **toda** string do banco antes do DOM (site e admin); validação server (RLS não escapa; escape é no client) |
-| 4 | Embed por URL livre (iframe arbitrário) | `convertToEmbed`: somente YouTube/Vimeo validados por regex; nunca URL de terceiros |
-| 5 | Regras  como única barreira + config pública | Config pública é **por design** (anon key publicável); **barreira real = RLS deny-by-default + policies por operação/papel**; secrets nunca no client |
-| 6 | Sem CSP | `vercel.json` com CSP restrito (`default-src 'self'`, sem `*`), `nosniff`, Referrer-Policy |
-| 7 | Código morto/sensível (`ALLOWED_EMAILS` const, branch upload) | Remoção do branch `upload` e constantes não usadas; reescrita do admin |
-| 8 | Sem rate limiting / força bruta | Mitigado pelo **Google OAuth** (provedor gerencia); CORS restrito; monitoração via log de auditoria (Supabase) |
-| 9 | Validação client-side como única defesa | RLS **server-side** é a defesa real (deny-by-default); validação client = UX, não segurança |
-| 10 | SDKs fixos sem política | Versões fixas por CDN (v2) + revisão registrada; documentar versões (SKILL.md) |
-| 11 | `onclick` com ID não escapado | Substituir por `addEventListener` + `dataset`/closure (nunca interpolar dados em handler) |
+| 1 | Login sem allowlist (qualquer conta entra) | **allowlist obrigatória** (`admin_emails`); lista vazia = deny |
+| 2/3 | XSS → innerHTML sem escape | `escapeHtml` em **toda** string do banco antes do DOM (site e admin) |
+| 4 | Embed por URL livre (iframe arbitrário) | `convertToEmbed`: somente Youtube/Vimeo validados por regex |
+| 5 | Config pública | **Por design** (anon/publishable key); barreira real = **RLS deny-by-default + policies por operação/papel**; secrets nunca no client |
+| 6 | Sem CSP | `vercel.json` com CSP restrito (`default-src 'self'`), `nosniff`, Referrer-Policy |
+| 7 | Código morto/sensível | Remoção de branches não usados e constantes desnecessárias; admin reescrito |
+| 8 | Sem rate limiting / força bruta | **Google OAuth** gerencia; CORS restrito; monitoração via log de auditoria |
+| 9 | Validação client-side como única defesa | **RLS server-side** é a defesa real; validação client = UX, não segurança |
+| 10 | CDN sem política de versão | Versões fixas por CDN + revisão registrada (ver `SKILL.md`) |
+| 11 | Handler com dado não escapado | `addEventListener` + `dataset`/closure; nunca interpolar dados em handler |
 
 ---
 
 ## 5. Fluxo do Painel Admin (simples, para a chefia)
 
-1. Chefia abre `admin.html` → **"Entrar com Google"**.
-2. `ALLOWED_EMAILS` (agora lido do Supabase/`admin_emails` com deny-by-default): e-mail não
-   autorizado → **"Acesso negado"**, painel oculto (**sem risco #1**).
-3. Formulário deslizante lateral (design conforme `design.md`): **Nome***, Biografia*,
+1. Chefia abre `admin.html` → **"Entrar com Google"** (OAuth do Supabase).
+2. E-mail verificado contra `admin_emails` (deny-by-default): não autorizado →
+   **"Acesso negado"**, painel oculto.
+3. Formulário deslizante lateral (conforme `design.md`): **Nome***, Biografia*,
    Foto (URL/Nenhuma), Vídeo (opcional), **Capas e Folhetos** (lista URL+título, ➕/✖).
 4. Salvar → grava no Postgres via Supabase → toast "Poetisa salva com sucesso!".
 
-**Visual**: 100% conforme `design.md` (sidebar `#2C1810`, terracota `#C4513D`, cards glassmorphism,
-formulário 520px, toast, modal de confirmação de exclusão) — **nenhuma mudança estética**.
+**Visual**: 100% conforme `design.md` (sidebar `#2C1810`, terracota `#C4513D`, cards,
+formulário 520px, toast, diálogo de confirmação de exclusão).
 
 ---
 
 ## 6. Fluxo do site público
 
-- `biografias.html` + `script.js` leem do Supabase (`anon key`, SELECT público via RLS) e
-  renderizam cards/modal/bio + **Capas e Folhetos** (nova).
-- **Fallback:** se o banco estiver indisponível, o site exibe o conteúdo estático inline
-  (como hoje) — **site nunca quebra** (robustez + simples).
-- Sem login para o visitante (Requisito: "site aberto para todos, simples e fácil de achar").
+- Páginas públicas (`index.html`, `biografias.html`, `poetisa.html`) leem do Supabase
+  (`anon key`, SELECT público via RLS) através de `back/acervo.js`.
+- **Fallback:** se o Supabase não estiver configurado/indisponível, o site exibe o conteúdo
+  estático local (as 8 poetisas atuais) — **o site nunca quebra**.
+- Sem login para o visitante.
 
 ---
 
-## 7. Migração de dados (do ático → Supabase)
+## 7. Migração de dados (do conteúdo estático → Supabase)
 
-- **Seed SQL** com as poetisas atuais (as já presentes em `biografias.html`/) para
-  popular a tabela na migração inicial; depois o admin passa a gerenciar via painel.
-- Os dados são portáveis: dumps SQL exportáveis a qualquer momento (longevidade).
+- **Seed SQL** com as poetisas atuais (as 8 do fallback estático) para popular a tabela na
+  migração inicial; depois o admin passa a gerenciar via painel.
+- Dados portáveis: dumps SQL exportáveis a qualquer momento (longevidade).
 
 ---
 
 ## 8. Deploy e custos
 
-- **Deploy**: site permanece estático na **Vercel** (sem change de infra); Supabase cuida do
+- **Deploy**: site permanece estático (Vercel ou hospedagem atual); Supabase cuida do
   banco/auth.
-- **Custo**: plano **free do Supabase** (50.000 documentos/linhas até escala, R$ 0 em
-  volume deste site). Se a chefia migrar a dados PostgreSQL próprio no futuro, o SQL sai
-  **sem reescrita** (universal).
-- Durabilidade: Supabase tem histórico de políticas de preço estáveis; e mesmo que mudassem,
-  os dados são Postgres exportável (resposta à "inumerável incógnita" de longo prazo).
-
----
+- **Custo**: plano **free do Supabase** (500 MB / cotas diárias, R$ 0 no volume deste site).
+  Se houver migração futura para PostgreSQL próprio, o SQL sai **sem reescrita** (universal).
 
 ### 8.1 Nota de dimensionamento — quantas poetisas cabem nos 500 MB? _(registrada 21/09/2026)_
 
@@ -216,29 +193,30 @@ formulário 520px, toast, modal de confirmação de exclusão) — **nenhuma mud
 > **~100.000 poetisas**. O limite prático nunca será o banco — só a digitação do conteúdo.
 
 ---
+
 ## 9. Arquivos afetados
 
 | Arquivo | Ação |
 |---|---|
-| `site/back/` | 🔄 → `supabase-config.js` (URL + publishable key) |
-| `site/estrutura/admin.html` | ↩️ reescrever dados (fonte: Supabase; visual: design.md) |
-| `site/back/script.js` | ↩️ reescrever dados (Supabase + RLS/escape/validação) |
-| `site/estrutura/biografias.html` | ✏️ editar scripts (barra Supabase) |
-| `supabase/migrations/001_init.sql` | 🆕 migração + seed + RLS |
+| `site/back/supabase-config.js` | ✅ criado (URL + anon key; placeholder) |
+| `site/estrutura/admin.html` | ✅ reescrito (Supabase Auth + CRUD + capas) |
+| `site/back/{acervo,home,biografias,poetisa,common}.js` | ✅ criados (leitura + fallback) |
+| `site/estrutura/*.html` | ✅ páginas públicas com o novo visual |
+| `supabase/migrations/001_init.sql` | 🆕 migração + seed + RLS (aplicar no console) |
 | `vercel.json` | 🆕 CSP/security headers |
 
 ---
 
-## 10. Fases de implementação (execução após aprovação)
+## 10. Fases de implementação
 
-| Fase | Entrega | Verificação |
+| Fase | Entrega | Status |
 |---|---|---|
-| 0 | Conta Supabase + projeto + config (interface) | dashboard acessível |
-| 1 | Migração SQL + RLS + seed | `supabase db push`; policies testam anon/authenticated |
-| 2 | `supabase-config.js` + `script.js` (leitura) | site público carrega do Postgres; fallback ok |
-| 3 | `admin.html` completo (login Google + CRUD + capas) | cadastro novo aparece no site público |
-| 4 | Segurança (CSP/Vercel, CORS, auditoria RLS) | checklist `SKILL.md` — zero segredos/`innerHTML` sem escape |
-| 5 | Documentação (`requisitos.md`, `memoria.md`, `backend.md`) | Regras 8 e 10 aplicadas |
+| 0 | Conta Supabase + projeto + config (interface) | ⏳ pendente (ação da chefia) |
+| 1 | Migração SQL + RLS + seed (`001_init.sql`) | ⏳ pendente |
+| 2 | `supabase-config.js` + `acervo.js` (leitura) | ✅ feito (com fallback) |
+| 3 | `admin.html` completo (login Google + CRUD + capas) | ✅ feito (aguarda Fase 0/1 para validar) |
+| 4 | Segurança (CSP/Vercel, CORS, auditoria RLS) | ⏳ pendente |
+| 5 | Documentação (`requisitos.md`, `memoria.md`, `backend.md`) | ✅ feito |
 
 ---
 
@@ -247,11 +225,11 @@ formulário 520px, toast, modal de confirmação de exclusão) — **nenhuma mud
 1. **E-mail(s) autorizado(s)** ao painel (ex.: e-mail da Karcia) — obrigatório.
 2. **Acesso ao dashboard Supabase** para aplicar migração/RLS (console) — ou autorização para
    que o agente o faça via SQL editor.
-3. **Campos mínimos**: Nome, Biografia, Foto, Capas (confirmado por você: apenas o necessário).
+3. **Campos mínimos**: Nome, Biografia, Foto, Capas (confirmado: apenas o necessário).
 4. Comportamento quando a chefia quiser **excluir** — manter botão "Excluir" com confirmação
-   (simples) — confirmar.
+   (simples) — confirmado.
 
 ---
 
-_Documento gerado em 21/09/2026. Registrar implementação concluída em `requisitos.md` (Regra 8)
+_Documento gerado em 21/09/2026. Registrar implementação no `requisitos.md` (Regra 8)
 após execução aprovada._
