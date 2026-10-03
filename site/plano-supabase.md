@@ -112,6 +112,12 @@ create policy "poetisas admin write" on poetisas
 
 ## 5. Fluxo do Painel Admin (simples, para a chefia)
 
+> **ESTADO ATUAL (02/10 — TEMPORÁRIO): acesso aberto.** Por decisão da chefia, o painel
+> **não exige mais login** (sem Google/allowlist): `admin.html` abre direto e a RLS de
+> `poetisas` aceita escrita de qualquer um via migração **`002_acesso_aberto.sql`** (a aplicar
+> no SQL Editor). O fluxo abaixo (login Google) é o **planejado/correto** e volta a valer quando
+> reverterem — bloco de reversão comentado no fim do `002`.
+
 1. Chefia abre `admin.html` → **"Entrar com Google"** (OAuth do Supabase).
 2. E-mail verificado contra `admin_emails` (deny-by-default): não autorizado →
    **"Acesso negado"**, painel oculto.
@@ -222,6 +228,7 @@ o Auth responde `400 validation_failed — Unsupported provider: provider is not
 | `site/back/{acervo,home,biografias,poetisa,common}.js` | ✅ criados (leitura + fallback) |
 | `site/estrutura/*.html` | ✅ páginas públicas com o novo visual |
 | `supabase/migrations/001_init.sql` | ✅ criado e **aplicado** via SQL Editor (chema + RLS + seed); seed idempotente (só popula tabela vazia) |
+| `supabase/migrations/002_acesso_aberto.sql` | 🔶 **criado, aguardando aplicar** via SQL Editor — período de acesso aberto (sem login, escrita `anon` em `poetisas`); contém bloco de reversão |
 | `site/vercel.json` | ✅ **template** de headers de segurança (CSP `default-src 'self'` + Google Fonts + jsdelivr + Supabase connect + YouTube/Vimeo frame, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`) — a **portar para o host final** (deploy não será Vercel) |
 
 ---

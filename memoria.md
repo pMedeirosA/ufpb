@@ -68,6 +68,8 @@ Site **"Memórias da Poesia Popular"** — acervo digital das poetisas da litera
 - Banner "em preparação" só aparece quando o banco devolve zero registros (com fallback, conteúdo é exibido normalmente).
 - Renderização dinâmica **sem innerHTML** (createElement + textContent) nos scripts novos.
 
+- **Acesso aberto no painel (temporário, a pedido da chefia 02/10):** sem login/conta — qualquer pessoa pode entrar e editar. `admin.html` abre direto (initAuth sem Google/allowlist) e a RLS de `poetisas` é aberta ao `anon` pela migração **`supabase/migrations/002_acesso_aberto.sql`** (a **aplicar no SQL Editor** do Supabase — sem ela o painel abre mas não salva). `admin_emails` segue protegida. **Reverter** quando a chefia decidir: rodar o bloco de reversão comentado no fim do `002`.
+
 ## Segurança (modelo de referência — não reproduzir)
 - Chave `anon`/publishable do Supabase é **pública** por design (front-end); a proteção real é o **RLS deny-by-default**, nunca o segredo da chave. `service_role` jamais no client-side.
 - Admin: allowlist em `admin_emails`; **lista vazia = acesso negado** (deny-by-default), e a RLS barra escrita/exclusão sem e-mail autorizado — painel efetivamente somente leitura sem permissão.
