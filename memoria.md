@@ -61,6 +61,7 @@ Site **"Memórias da Poesia Popular"** — acervo digital das poetisas da litera
 ## Decisões-chave
 - **Deploy final = domínio próprio, hospedagem a definir — NÃO será Vercel** (decisão da chefia, 25/09/2026). O `site/vercel.json` vira **template** de headers a portar para o host escolhido.
 - **Back-end do projeto = Supabase do `plano-supabase.md`** (escolha explícita do usuário). Sem o back do build novo (sem Storage, sem tabela `obras`, sem `status`, campos `video_url`/`covers` mantidos no schema do plano).
+- **Front-end oficial = `/site` estático (sem Vite/build)**. Em 02/10 chegaram commits externos trazendo a "casca" do projeto Vite (raiz `index.html`, `404.html`, `package.json`, `vite.config.js`, `vercel.json`, `.env.example`, `README.md`) — **incompleta**, sem `src/` nem páginas `sobre|biografias|poetisa|contato|admin/` (o fonte completo do designer em `Downloads/ufpb-main-modificado` havia sido apagado). Decisão do usuário: **desfazer o novo e manter só o `/site`** — revertido para `7448f49` e push forçado (remoção dos commits `1111b9d`/`f3a2cee` e do `ufpb-main-modificado.zip`). A pasta `Downloads/ufpb-main*.zip` é só o export da main, desconsiderar.
 - Card individual de poetisa incluído (`poetisa.html?slug=...`).
 - Fallback estático de 8 poetisas garante que o site nunca quebra sem o Supabase configurado.
 - Formulário de contato **desabilitado** (canal institucional em validação) até a UFPB confirmar o destino oficial.
