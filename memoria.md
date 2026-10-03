@@ -70,6 +70,9 @@ Site **"Memórias da Poesia Popular"** — acervo digital das poetisas da litera
 - Renderização dinâmica **sem innerHTML** (createElement + textContent) nos scripts novos.
 
 - **Acesso aberto no painel (temporário, a pedido da chefia 02/10):** sem login/conta — qualquer pessoa pode entrar e editar. `admin.html` abre direto (initAuth sem Google/allowlist) e a RLS de `poetisas` é aberta ao `anon` pela migração **`supabase/migrations/002_acesso_aberto.sql`** (a **aplicar no SQL Editor** do Supabase — sem ela o painel abre mas não salva). `admin_emails` segue protegida. **Reverter** quando a chefia decidir: rodar o bloco de reversão comentado no fim do `002`.
+  - **ESTADO (02/10, verificado via API): `002` AINDA NÃO aplicado** — INSERT anônimo respondeu **401**. Até rodar o `002`, o admin abre mas salvar/editar/excluir falha (RLS barra).
+- **Pasta "adm ufpb" (02/10, em `C:\Users\asluc\OneDrive\Documents\adm ufpb`):** entrega para a supervisora adicionar poetisas — cópia independente **só do admin** (`estrutura/admin.html` + `back/supabase-config.js` + `fonts/`) + launcher próprio (`iniciar-site.bat/.ps1` abrindo o painel). Banco é o mesmo Supabase cloud → o que ela cadastrar aparece no projeto e vice-versa.
+- **Limpeza do acervo (02/10):** migração **`supabase/migrations/003_limpar_poetisas.sql`** (`delete from public.poetisas`) para o banco começar vazio. **A aplicar no SQL Editor junto com o `002`** (o SQL Editor roda como superuser e ignora RLS).
 
 ## Segurança (modelo de referência — não reproduzir)
 - Chave `anon`/publishable do Supabase é **pública** por design (front-end); a proteção real é o **RLS deny-by-default**, nunca o segredo da chave. `service_role` jamais no client-side.
